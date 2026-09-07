@@ -16,7 +16,7 @@ public class Cv {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "nom_fichier", nullable = false, length = 255)
     private String nomFichier;
@@ -24,7 +24,14 @@ public class Cv {
     @Column(name = "chemin_fichier", nullable = false, length = 255)
     private String cheminFichier;
 
-    @Column(name = "date_upload", nullable = false, updatable = false)
+    @Column(name = "date_upload", nullable = false)
     private LocalDateTime dateUpload;
+
+    @PrePersist
+    void onCreate() {
+        if (dateUpload == null) {
+            dateUpload = LocalDateTime.now();
+        }
+    }
 
 }
