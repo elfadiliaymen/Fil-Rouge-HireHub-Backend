@@ -1,0 +1,30 @@
+package com.HireHub.HireHub.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "cvs")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class Cv {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "nom_fichier", nullable = false, length = 255)
+    private String nomFichier;
+
+    @Column(name = "chemin_fichier", nullable = false, length = 255)
+    private String cheminFichier;
+
+    @Column(name = "date_upload", nullable = false, updatable = false)
+    private LocalDateTime dateUpload;
+
+}
