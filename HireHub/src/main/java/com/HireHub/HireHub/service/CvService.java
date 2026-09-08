@@ -1,7 +1,12 @@
 package com.HireHub.HireHub.service;
 
+import com.HireHub.HireHub.dto.CvFichier;
+import com.HireHub.HireHub.dto.CvRequest;
+import com.HireHub.HireHub.dto.CvResponse;
+import com.HireHub.HireHub.dto.DTOMapper;
 import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.User;
+import com.HireHub.HireHub.exception.ResourceNotFoundException;
 import com.HireHub.HireHub.repository.CvRepository;
 import com.HireHub.HireHub.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -22,58 +27,83 @@ public class CvService {
         this.userRepository = userRepository;
     }
 
-    public Cv consulterCVparId(long cvId) {
-        return cvRepository.findById(cvId).orElse(null);
+    public CvResponse consulterCVparId(long cvId) {
+        return DTOMapper.toCvResponse(requerirCv(cvId));
     }
 
-    public Cv consulterCVparNom(String cvNom) {
-        return cvRepository.findByNomFichier(cvNom);
+    public CvResponse consulterCVparNom(String cvNom) {
+        Cv cv = cvRepository.findByNomFichier(cvNom);
+        if (cv == null) {
+            throw new ResourceNotFoundException("CV introuvable avec le nom " + cvNom);
+        }
+        return DTOMapper.toCvResponse(cv);
     }
 
-    public Page<Cv> listerAllCv(Pageable pageable) {
-        return cvRepository.findAll(pageable);
+    public Page<CvResponse> listerAllCv(Pageable pageable) {
+        return cvRepository.findAll(pageable).map(DTOMapper::toCvResponse);
     }
 
-    public Page<Cv> listerCVParCandidat(long candidatId, Pageable pageable) {
-        return cvRepository.findByCandidatId(candidatId, pageable);
+    public Page<CvResponse> listerCVParCandidat(long candidatId, Pageable pageable) {
+        return cvRepository.findByCandidatId(candidatId, pageable).map(DTOMapper::toCvResponse);
     }
 
-    public Cv uploadCv(long candidatId, MultipartFile fichier) throws IOException {
+    public CvFichier telechargerCv(long cvId) {
+        Cv cv = requerirCv(cvId);
+        if (cv.getContenu() == null) {
+            throw new ResourceNotFoundException("Le CV n'a pas de contenu enregistré");
+        }
+        return new CvFichier(cv.getNomFichier(), cv.getContenu());
+    }
+
+    public CvResponse uploadCv(long candidatId, MultipartFile fichier) throws IOException {
+        User candidat = requeteCandidat(candidatId);
         if (fichier.isEmpty() || !"application/pdf".equalsIgnoreCase(fichier.getContentType())) {
             throw new IllegalArgumentException("Le CV doit être un fichier PDF");
-        }
-        User candidat = userRepository.findById(candidatId).orElse(null);
-        if (candidat == null) {
-            throw new IllegalArgumentException("Candidat introuvable");
         }
         Cv cv = new Cv();
         cv.setCandidat(candidat);
         cv.setNomFichier(fichier.getOriginalFilename());
         cv.setCheminFichier("uploads/cv");
         cv.setContenu(fichier.getBytes());
-        return cvRepository.save(cv);
+        return DTOMapper.toCvResponse(cvRepository.save(cv));
     }
 
-    public Cv remplacerCv(long cvId, MultipartFile fichier) throws IOException {
-        Cv cv = consulterCVparId(cvId);
-        if (cv == null) {
-            throw new IllegalArgumentException("CV introuvable");
-        }
+    public CvResponse remplacerCv(long cvId, MultipartFile fichier) throws IOException {
+        Cv cv = requerirCv(cvId);
         if (fichier.isEmpty() || !"application/pdf".equalsIgnoreCase(fichier.getContentType())) {
             throw new IllegalArgumentException("Le CV doit être un fichier PDF");
         }
         cv.setNomFichier(fichier.getOriginalFilename());
         cv.setCheminFichier("uploads/cv");
         cv.setContenu(fichier.getBytes());
-        return cvRepository.save(cv);
+        return DTOMapper.toCvResponse(cvRepository.save(cv));
     }
 
-    public Cv updateCv(Cv cv) {
-        return cvRepository.save(cv);
+    public CvResponse creerCv(CvRequest request) {
+        Cv cv = DTOMapper.toCv(request, requeteCandidat(request.candidatId()));
+        return DTOMapper.toCvResponse(cvRepository.save(cv));
+    }
+
+    public CvResponse updateCv(long cvId, CvRequest request) {
+        Cv cv = requerirCv(cvId);
+        cv.setCandidat(requeteCandidat(request.candidatId()));
+        cv.setNomFichier(request.nomFichier());
+        cv.setCheminFichier(request.cheminFichier());
+        return DTOMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public String deleteCv(long cvId) {
         cvRepository.deleteById(cvId);
         return "CV supprimé avec succès";
+    }
+
+    private Cv requerirCv(long cvId) {
+        return cvRepository.findById(cvId)
+                .orElseThrow(() -> new ResourceNotFoundException("CV introuvable avec l'id " + cvId));
+    }
+
+    private User requeteCandidat(long candidatId) {
+        return userRepository.findById(candidatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable avec l'id " + candidatId));
     }
 }

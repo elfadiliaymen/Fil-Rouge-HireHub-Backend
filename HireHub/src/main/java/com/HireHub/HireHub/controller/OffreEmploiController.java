@@ -1,7 +1,8 @@
 package com.HireHub.HireHub.controller;
 
-import com.HireHub.HireHub.entity.Candidature;
-import com.HireHub.HireHub.entity.OffreEmploi;
+import com.HireHub.HireHub.dto.CandidatureResponse;
+import com.HireHub.HireHub.dto.OffreRequest;
+import com.HireHub.HireHub.dto.OffreResponse;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.service.OffreEmploiService;
 import org.springframework.data.domain.Page;
@@ -22,47 +23,47 @@ public class OffreEmploiController {
     }
 
     @GetMapping
-    public Page<OffreEmploi> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<OffreResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return offreEmploiService.listerToutesLesOffres(pageable);
     }
 
     @GetMapping("/{id}")
-    public OffreEmploi findById(@PathVariable long id) {
+    public OffreResponse findById(@PathVariable long id) {
         return offreEmploiService.consulterOffreParId(id);
     }
 
     @GetMapping("/type/{typeContrat}")
-    public Page<OffreEmploi> findByTypeContrat(@PathVariable TypeContrat typeContrat,
-                                               @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<OffreResponse> findByTypeContrat(@PathVariable TypeContrat typeContrat,
+                                                 @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParTypeContrat(typeContrat, pageable);
     }
 
     @GetMapping("/localisation/{localisation}")
-    public Page<OffreEmploi> findByLocalisation(@PathVariable String localisation,
-                                                @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<OffreResponse> findByLocalisation(@PathVariable String localisation,
+                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParLocalisation(localisation, pageable);
     }
 
     @GetMapping("/recruteur/{recruteurId}")
-    public Page<OffreEmploi> findByRecruteur(@PathVariable long recruteurId,
-                                             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<OffreResponse> findByRecruteur(@PathVariable long recruteurId,
+                                               @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParRecruteur(recruteurId, pageable);
     }
 
     @GetMapping("/{id}/candidatures")
-    public Page<Candidature> candidaturesParOffre(@PathVariable long id,
-                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<CandidatureResponse> candidaturesParOffre(@PathVariable long id,
+                                                          @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return offreEmploiService.listerCandidaturesParOffre(id, pageable);
     }
 
     @PostMapping
-    public ResponseEntity<OffreEmploi> save(@RequestBody OffreEmploi offreEmploi) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(offreEmploiService.creerOffre(offreEmploi));
+    public ResponseEntity<OffreResponse> save(@RequestBody OffreRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(offreEmploiService.creerOffre(request));
     }
 
-    @PutMapping
-    public ResponseEntity<OffreEmploi> update(@RequestBody OffreEmploi offreEmploi) {
-        return ResponseEntity.ok(offreEmploiService.updateOffre(offreEmploi));
+    @PutMapping("/{id}")
+    public OffreResponse update(@PathVariable long id, @RequestBody OffreRequest request) {
+        return offreEmploiService.updateOffre(id, request);
     }
 
     @DeleteMapping("/{id}")

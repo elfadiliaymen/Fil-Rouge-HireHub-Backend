@@ -1,6 +1,9 @@
 package com.HireHub.HireHub.controller;
 
+import com.HireHub.HireHub.dto.CvRequest;
+import com.HireHub.HireHub.dto.CvResponse;
 import com.HireHub.HireHub.entity.Cv;
+import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.repository.CvRepository;
 import com.HireHub.HireHub.repository.UserRepository;
 import com.HireHub.HireHub.service.CvService;
@@ -11,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,20 +23,18 @@ class CvControllerTest {
 
     @Test
     void shouldCreateCvFromJson() {
-        CvController controller = new CvController(new CvService(repositoryProxy(1L), userRepositoryProxy()));
+        CvController controller = new CvController(new CvService(repositoryProxy(1L), userRepositoryProxy(1L)));
 
-        Cv cv = new Cv();
-        cv.setNomFichier("myfirstcv01");
-        cv.setCheminFichier("downloads/doc");
+        CvRequest request = new CvRequest(1L, "myfirstcv01", "downloads/doc");
 
-        ResponseEntity<Cv> response = controller.save(cv);
+        ResponseEntity<CvResponse> response = controller.save(request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
-        assertEquals("myfirstcv01", response.getBody().getNomFichier());
-        assertEquals("downloads/doc", response.getBody().getCheminFichier());
+        assertEquals(1L, response.getBody().id());
+        assertEquals("myfirstcv01", response.getBody().nomFichier());
+        assertEquals("downloads/doc", response.getBody().cheminFichier());
     }
 
     private CvRepository repositoryProxy(long generatedId) {
@@ -58,8 +60,13 @@ class CvControllerTest {
         );
     }
 
-    private UserRepository userRepositoryProxy() {
+    private UserRepository userRepositoryProxy(long userId) {
         InvocationHandler handler = (Object proxy, Method method, Object[] args) -> {
+            if ("findById".equals(method.getName())) {
+                User user = new User();
+                user.setId(userId);
+                return Optional.of(user);
+            }
             if ("toString".equals(method.getName())) {
                 return "UserRepositoryProxy";
             }

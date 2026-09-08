@@ -1,7 +1,12 @@
 package com.HireHub.HireHub.service;
 
+import com.HireHub.HireHub.dto.DTOMapper;
+import com.HireHub.HireHub.dto.RegisterRequest;
+import com.HireHub.HireHub.dto.UserRequest;
+import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
+import com.HireHub.HireHub.exception.ResourceNotFoundException;
 import com.HireHub.HireHub.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,73 +24,70 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Page<User> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserResponse> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable).map(DTOMapper::toUserResponse);
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public User getUserByNom(String nom) {
-        return userRepository.findByNom(nom);
-    }
-
-    public User getUserById(long id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
-    public User creerUtilisateur(User user) {
-        return userRepository.save(user);
-    }
-
-    public User inscrire(User user) {
-        if (user.getRole() == null) {
-            user.setRole(Role.CANDIDAT);
-        }
-        user.setActive(true);
-        return userRepository.save(user);
-    }
-
-    public User updateUtilisateur(long id, User user) {
-        User existant = getUserById(id);
-        if (existant == null) {
-            return null;
-        }
-        if (user.getNom() != null) {
-            existant.setNom(user.getNom());
-        }
-        if (user.getPrenom() != null) {
-            existant.setPrenom(user.getPrenom());
-        }
-        if (user.getEmail() != null) {
-            existant.setEmail(user.getEmail());
-        }
-        if (user.getPassword() != null) {
-            existant.setPassword(user.getPassword());
-        }
-        if (user.getRole() != null) {
-            existant.setRole(user.getRole());
-        }
-        return userRepository.save(existant);
-    }
-
-    public User activer(long id) {
-        User user = getUserById(id);
+    public UserResponse getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
         if (user == null) {
-            return null;
+            throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
         }
-        user.setActive(true);
-        return userRepository.save(user);
+        return DTOMapper.toUserResponse(user);
     }
 
-    public User desactiver(long id) {
-        User user = getUserById(id);
+    public UserResponse getUserByNom(String nom) {
+        User user = userRepository.findByNom(nom);
         if (user == null) {
-            return null;
+            throw new ResourceNotFoundException("Utilisateur introuvable avec le nom " + nom);
         }
+        return DTOMapper.toUserResponse(user);
+    }
+
+    public UserResponse getUserById(long id) {
+        return DTOMapper.toUserResponse(requerirUtilisateur(id));
+    }
+
+    public UserResponse creerUtilisateur(UserRequest request) {
+        User user = DTOMapper.toUser(request);
+        return DTOMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public UserResponse inscrire(RegisterRequest request) {
+        User user = DTOMapper.toUser(request);
+        return DTOMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public UserResponse updateUtilisateur(long id, UserRequest request) {
+        User existant = requerirUtilisateur(id);
+        if (request.nom() != null) {
+            existant.setNom(request.nom());
+        }
+        if (request.prenom() != null) {
+            existant.setPrenom(request.prenom());
+        }
+        if (request.email() != null) {
+            existant.setEmail(request.email());
+        }
+        if (request.password() != null) {
+            existant.setPassword(request.password());
+        }
+        if (request.role() != null) {
+            existant.setRole(request.role());
+        }
+        return DTOMapper.toUserResponse(userRepository.save(existant));
+    }
+
+    public UserResponse activer(long id) {
+        User user = requerirUtilisateur(id);
+        user.setActive(true);
+        return DTOMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public UserResponse desactiver(long id) {
+        User user = requerirUtilisateur(id);
         user.setActive(false);
-        return userRepository.save(user);
+        return DTOMapper.toUserResponse(userRepository.save(user));
     }
 
     public String deleteUtilisateur(long id) {
@@ -93,8 +95,8 @@ public class UserService {
         return "Utilisateur supprimé avec succès";
     }
 
-    public Page<User> listerParRole(Role role, Pageable pageable) {
-        return userRepository.findByRole(role, pageable);
+    public Page<UserResponse> listerParRole(Role role, Pageable pageable) {
+        return userRepository.findByRole(role, pageable).map(DTOMapper::toUserResponse);
     }
 
     public Map<String, Long> statistiques() {
@@ -106,5 +108,10 @@ public class UserService {
         stats.put("recruteurs", userRepository.countByRole(Role.RECRUTEUR));
         stats.put("candidats", userRepository.countByRole(Role.CANDIDAT));
         return stats;
+    }
+
+    private User requerirUtilisateur(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'id " + id));
     }
 }

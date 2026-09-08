@@ -1,6 +1,8 @@
 package com.HireHub.HireHub.controller;
 
-import com.HireHub.HireHub.entity.User;
+import com.HireHub.HireHub.dto.RegisterRequest;
+import com.HireHub.HireHub.dto.UserRequest;
+import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.service.UserService;
 import org.springframework.data.domain.Page;
@@ -23,27 +25,27 @@ public class UserController {
     }
 
     @GetMapping
-    public Page<User> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<UserResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return userService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable long id) {
+    public UserResponse findById(@PathVariable long id) {
         return userService.getUserById(id);
     }
 
     @GetMapping("/email/{email}")
-    public User findByEmail(@PathVariable String email) {
+    public UserResponse findByEmail(@PathVariable String email) {
         return userService.getUserByEmail(email);
     }
 
     @GetMapping("/nom/{nom}")
-    public User findByNom(@PathVariable String nom) {
+    public UserResponse findByNom(@PathVariable String nom) {
         return userService.getUserByNom(nom);
     }
 
     @GetMapping("/role/{role}")
-    public Page<User> findByRole(@PathVariable Role role, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<UserResponse> findByRole(@PathVariable Role role, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return userService.listerParRole(role, pageable);
     }
 
@@ -53,40 +55,28 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.inscrire(user));
+    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.inscrire(request));
     }
 
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.creerUtilisateur(user));
+    public ResponseEntity<UserResponse> save(@RequestBody UserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.creerUtilisateur(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable long id, @RequestBody User user) {
-        User misAJour = userService.updateUtilisateur(id, user);
-        if (misAJour == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(misAJour);
+    public UserResponse update(@PathVariable long id, @RequestBody UserRequest request) {
+        return userService.updateUtilisateur(id, request);
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<User> activate(@PathVariable long id) {
-        User actived = userService.activer(id);
-        if (actived == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(actived);
+    public UserResponse activate(@PathVariable long id) {
+        return userService.activer(id);
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<User> deactivate(@PathVariable long id) {
-        User desactive = userService.desactiver(id);
-        if (desactive == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(desactive);
+    public UserResponse deactivate(@PathVariable long id) {
+        return userService.desactiver(id);
     }
 
     @DeleteMapping("/{id}")
