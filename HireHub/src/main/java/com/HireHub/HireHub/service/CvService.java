@@ -4,11 +4,12 @@ import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.repository.CvRepository;
 import com.HireHub.HireHub.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class CvService {
@@ -29,12 +30,12 @@ public class CvService {
         return cvRepository.findByNomFichier(cvNom);
     }
 
-    public List<Cv> listerAllCv() {
-        return cvRepository.findAll();
+    public Page<Cv> listerAllCv(Pageable pageable) {
+        return cvRepository.findAll(pageable);
     }
 
-    public List<Cv> listerCVParCandidat(long candidatId) {
-        return cvRepository.findByCandidatId(candidatId);
+    public Page<Cv> listerCVParCandidat(long candidatId, Pageable pageable) {
+        return cvRepository.findByCandidatId(candidatId, pageable);
     }
 
     public Cv uploadCv(long candidatId, MultipartFile fichier) throws IOException {

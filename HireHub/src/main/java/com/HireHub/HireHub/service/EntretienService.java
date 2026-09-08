@@ -2,10 +2,11 @@ package com.HireHub.HireHub.service;
 
 import com.HireHub.HireHub.entity.Entretien;
 import com.HireHub.HireHub.repository.EntretienRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class EntretienService {
@@ -20,20 +21,20 @@ public class EntretienService {
         return entretienRepository.findById(entretienId).orElse(null);
     }
 
-    public List<Entretien> listerTousLesEntretiens() {
-        return entretienRepository.findAll();
+    public Page<Entretien> listerTousLesEntretiens(Pageable pageable) {
+        return entretienRepository.findAll(pageable);
     }
 
-    public List<Entretien> listerEntretiensParDate(LocalDate date) {
-        return entretienRepository.findByDate(date);
+    public Page<Entretien> listerEntretiensParDate(LocalDate date, Pageable pageable) {
+        return entretienRepository.findByDate(date, pageable);
     }
 
-    public List<Entretien> listerEntretiensParRecruteur(long recruteurId) {
-        return entretienRepository.findByRecruteurId(recruteurId);
+    public Page<Entretien> listerEntretiensParRecruteur(long recruteurId, Pageable pageable) {
+        return entretienRepository.findByRecruteurId(recruteurId, pageable);
     }
 
-    public List<Entretien> listerEntretiensParCandidature(long candidatureId) {
-        return entretienRepository.findByCandidatureId(candidatureId);
+    public Page<Entretien> listerEntretiensParCandidature(long candidatureId, Pageable pageable) {
+        return entretienRepository.findByCandidatureId(candidatureId, pageable);
     }
 
     public Entretien planifierEntretien(Entretien entretien) {

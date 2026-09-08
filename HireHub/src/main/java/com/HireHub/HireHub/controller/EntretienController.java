@@ -2,12 +2,14 @@ package com.HireHub.HireHub.controller;
 
 import com.HireHub.HireHub.entity.Entretien;
 import com.HireHub.HireHub.service.EntretienService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/entretiens")
@@ -20,8 +22,8 @@ public class EntretienController {
     }
 
     @GetMapping
-    public List<Entretien> findAll() {
-        return entretienService.listerTousLesEntretiens();
+    public Page<Entretien> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return entretienService.listerTousLesEntretiens(pageable);
     }
 
     @GetMapping("/{id}")
@@ -30,18 +32,21 @@ public class EntretienController {
     }
 
     @GetMapping("/date/{date}")
-    public List<Entretien> findByDate(@PathVariable LocalDate date) {
-        return entretienService.listerEntretiensParDate(date);
+    public Page<Entretien> findByDate(@PathVariable LocalDate date,
+                                      @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return entretienService.listerEntretiensParDate(date, pageable);
     }
 
     @GetMapping("/recruteur/{recruteurId}")
-    public List<Entretien> findByRecruteur(@PathVariable long recruteurId) {
-        return entretienService.listerEntretiensParRecruteur(recruteurId);
+    public Page<Entretien> findByRecruteur(@PathVariable long recruteurId,
+                                           @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return entretienService.listerEntretiensParRecruteur(recruteurId, pageable);
     }
 
     @GetMapping("/candidature/{candidatureId}")
-    public List<Entretien> findByCandidature(@PathVariable long candidatureId) {
-        return entretienService.listerEntretiensParCandidature(candidatureId);
+    public Page<Entretien> findByCandidature(@PathVariable long candidatureId,
+                                             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return entretienService.listerEntretiensParCandidature(candidatureId, pageable);
     }
 
     @PostMapping
@@ -55,7 +60,7 @@ public class EntretienController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
-        entretienService.deleteEntretien(id);
+    public String delete(@PathVariable long id) {
+        return entretienService.deleteEntretien(id);
     }
 }

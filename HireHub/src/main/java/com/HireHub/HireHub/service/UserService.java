@@ -3,10 +3,11 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -18,8 +19,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public User getUserByEmail(String email) {
@@ -92,8 +93,8 @@ public class UserService {
         return "Utilisateur supprimé avec succès";
     }
 
-    public List<User> listerParRole(Role role) {
-        return userRepository.findByRole(role);
+    public Page<User> listerParRole(Role role, Pageable pageable) {
+        return userRepository.findByRole(role, pageable);
     }
 
     public Map<String, Long> statistiques() {

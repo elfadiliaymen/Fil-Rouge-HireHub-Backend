@@ -4,11 +4,12 @@ import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.service.OffreEmploiService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/offres")
@@ -21,8 +22,8 @@ public class OffreEmploiController {
     }
 
     @GetMapping
-    public List<OffreEmploi> findAll() {
-        return offreEmploiService.listerToutesLesOffres();
+    public Page<OffreEmploi> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return offreEmploiService.listerToutesLesOffres(pageable);
     }
 
     @GetMapping("/{id}")
@@ -31,23 +32,27 @@ public class OffreEmploiController {
     }
 
     @GetMapping("/type/{typeContrat}")
-    public List<OffreEmploi> findByTypeContrat(@PathVariable TypeContrat typeContrat) {
-        return offreEmploiService.listerOffresParTypeContrat(typeContrat);
+    public Page<OffreEmploi> findByTypeContrat(@PathVariable TypeContrat typeContrat,
+                                               @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return offreEmploiService.listerOffresParTypeContrat(typeContrat, pageable);
     }
 
     @GetMapping("/localisation/{localisation}")
-    public List<OffreEmploi> findByLocalisation(@PathVariable String localisation) {
-        return offreEmploiService.listerOffresParLocalisation(localisation);
+    public Page<OffreEmploi> findByLocalisation(@PathVariable String localisation,
+                                                @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return offreEmploiService.listerOffresParLocalisation(localisation, pageable);
     }
 
     @GetMapping("/recruteur/{recruteurId}")
-    public List<OffreEmploi> findByRecruteur(@PathVariable long recruteurId) {
-        return offreEmploiService.listerOffresParRecruteur(recruteurId);
+    public Page<OffreEmploi> findByRecruteur(@PathVariable long recruteurId,
+                                             @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return offreEmploiService.listerOffresParRecruteur(recruteurId, pageable);
     }
 
     @GetMapping("/{id}/candidatures")
-    public List<Candidature> candidaturesParOffre(@PathVariable long id) {
-        return offreEmploiService.listerCandidaturesParOffre(id);
+    public Page<Candidature> candidaturesParOffre(@PathVariable long id,
+                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return offreEmploiService.listerCandidaturesParOffre(id, pageable);
     }
 
     @PostMapping

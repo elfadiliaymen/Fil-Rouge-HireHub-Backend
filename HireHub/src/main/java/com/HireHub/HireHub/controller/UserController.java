@@ -3,11 +3,13 @@ package com.HireHub.HireHub.controller;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,8 +23,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> findAll() {
-        return userService.findAll();
+    public Page<User> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return userService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
@@ -41,8 +43,8 @@ public class UserController {
     }
 
     @GetMapping("/role/{role}")
-    public List<User> findByRole(@PathVariable Role role) {
-        return userService.listerParRole(role);
+    public Page<User> findByRole(@PathVariable Role role, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return userService.listerParRole(role, pageable);
     }
 
     @GetMapping("/stats")

@@ -5,9 +5,9 @@ import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.repository.CandidatureRepository;
 import com.HireHub.HireHub.repository.OffreEmploiRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class OffreEmploiService {
@@ -24,24 +24,24 @@ public class OffreEmploiService {
         return offreEmploiRepository.findById(offreId).orElse(null);
     }
 
-    public List<OffreEmploi> listerToutesLesOffres() {
-        return offreEmploiRepository.findAll();
+    public Page<OffreEmploi> listerToutesLesOffres(Pageable pageable) {
+        return offreEmploiRepository.findAll(pageable);
     }
 
-    public List<OffreEmploi> listerOffresParTypeContrat(TypeContrat typeContrat) {
-        return offreEmploiRepository.findByTypeContrat(typeContrat);
+    public Page<OffreEmploi> listerOffresParTypeContrat(TypeContrat typeContrat, Pageable pageable) {
+        return offreEmploiRepository.findByTypeContrat(typeContrat, pageable);
     }
 
-    public List<OffreEmploi> listerOffresParLocalisation(String localisation) {
-        return offreEmploiRepository.findByLocalisation(localisation);
+    public Page<OffreEmploi> listerOffresParLocalisation(String localisation, Pageable pageable) {
+        return offreEmploiRepository.findByLocalisation(localisation, pageable);
     }
 
-    public List<OffreEmploi> listerOffresParRecruteur(long recruteurId) {
-        return offreEmploiRepository.findByRecruteurId(recruteurId);
+    public Page<OffreEmploi> listerOffresParRecruteur(long recruteurId, Pageable pageable) {
+        return offreEmploiRepository.findByRecruteurId(recruteurId, pageable);
     }
 
-    public List<Candidature> listerCandidaturesParOffre(long offreId) {
-        return candidatureRepository.findByOffreId(offreId);
+    public Page<Candidature> listerCandidaturesParOffre(long offreId, Pageable pageable) {
+        return candidatureRepository.findByOffreId(offreId, pageable);
     }
 
     public OffreEmploi creerOffre(OffreEmploi offreEmploi) {

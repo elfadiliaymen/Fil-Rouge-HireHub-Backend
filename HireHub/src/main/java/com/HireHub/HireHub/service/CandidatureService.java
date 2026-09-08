@@ -3,9 +3,9 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.enums.StatutCandidature;
 import com.HireHub.HireHub.repository.CandidatureRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CandidatureService {
@@ -20,20 +20,20 @@ public class CandidatureService {
         return candidatureRepository.findById(candidatureId).orElse(null);
     }
 
-    public List<Candidature> listerToutesLesCandidatures() {
-        return candidatureRepository.findAll();
+    public Page<Candidature> listerToutesLesCandidatures(Pageable pageable) {
+        return candidatureRepository.findAll(pageable);
     }
 
-    public List<Candidature> listerCandidaturesParStatut(StatutCandidature statut) {
-        return candidatureRepository.findByStatut(statut);
+    public Page<Candidature> listerCandidaturesParStatut(StatutCandidature statut, Pageable pageable) {
+        return candidatureRepository.findByStatut(statut, pageable);
     }
 
-    public List<Candidature> listerCandidaturesParCandidat(long candidatId) {
-        return candidatureRepository.findByCandidatId(candidatId);
+    public Page<Candidature> listerCandidaturesParCandidat(long candidatId, Pageable pageable) {
+        return candidatureRepository.findByCandidatId(candidatId, pageable);
     }
 
-    public List<Candidature> listerCandidaturesParOffre(long offreId) {
-        return candidatureRepository.findByOffreId(offreId);
+    public Page<Candidature> listerCandidaturesParOffre(long offreId, Pageable pageable) {
+        return candidatureRepository.findByOffreId(offreId, pageable);
     }
 
     public Candidature soumettreCandidature(Candidature candidature) {
