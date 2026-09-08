@@ -46,14 +46,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        if (user != null && user.isActive() && user.getPassword().equals(password)) {
-            return user;
-        }
-        return null;
-    }
-
     public User updateUtilisateur(long id, User user) {
         User existant = getUserById(id);
         if (existant == null) {

@@ -55,20 +55,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.inscrire(user));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody User user) {
-        User utilisateur = userService.login(user.getEmail(), user.getPassword());
-        if (utilisateur == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return ResponseEntity.ok(utilisateur);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return ResponseEntity.ok("Déconnexion réussie");
-    }
-
     @PostMapping
     public ResponseEntity<User> save(@RequestBody User user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.creerUtilisateur(user));
