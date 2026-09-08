@@ -28,6 +28,14 @@ public class EntretienService {
         return entretienRepository.findByDate(date);
     }
 
+    public List<Entretien> listerEntretiensParRecruteur(long recruteurId) {
+        return entretienRepository.findByRecruteurId(recruteurId);
+    }
+
+    public List<Entretien> listerEntretiensParCandidature(long candidatureId) {
+        return entretienRepository.findByCandidatureId(candidatureId);
+    }
+
     public Entretien planifierEntretien(Entretien entretien) {
         return entretienRepository.save(entretien);
     }
@@ -38,6 +46,6 @@ public class EntretienService {
 
     public String deleteEntretien(long entretienId) {
         entretienRepository.deleteById(entretienId);
-        return "Entretien deleted successfully";
+        return "Entretien supprimé avec succès";
     }
 }

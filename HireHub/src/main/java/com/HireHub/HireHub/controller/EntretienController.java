@@ -34,6 +34,16 @@ public class EntretienController {
         return entretienService.listerEntretiensParDate(date);
     }
 
+    @GetMapping("/recruteur/{recruteurId}")
+    public List<Entretien> findByRecruteur(@PathVariable long recruteurId) {
+        return entretienService.listerEntretiensParRecruteur(recruteurId);
+    }
+
+    @GetMapping("/candidature/{candidatureId}")
+    public List<Entretien> findByCandidature(@PathVariable long candidatureId) {
+        return entretienService.listerEntretiensParCandidature(candidatureId);
+    }
+
     @PostMapping
     public ResponseEntity<Entretien> save(@RequestBody Entretien entretien) {
         return ResponseEntity.status(HttpStatus.CREATED).body(entretienService.planifierEntretien(entretien));
