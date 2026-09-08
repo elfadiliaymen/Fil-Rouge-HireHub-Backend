@@ -1,5 +1,6 @@
 package com.HireHub.HireHub.controller;
 
+import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.service.OffreEmploiService;
@@ -39,6 +40,16 @@ public class OffreEmploiController {
         return offreEmploiService.listerOffresParLocalisation(localisation);
     }
 
+    @GetMapping("/recruteur/{recruteurId}")
+    public List<OffreEmploi> findByRecruteur(@PathVariable long recruteurId) {
+        return offreEmploiService.listerOffresParRecruteur(recruteurId);
+    }
+
+    @GetMapping("/{id}/candidatures")
+    public List<Candidature> candidaturesParOffre(@PathVariable long id) {
+        return offreEmploiService.listerCandidaturesParOffre(id);
+    }
+
     @PostMapping
     public ResponseEntity<OffreEmploi> save(@RequestBody OffreEmploi offreEmploi) {
         return ResponseEntity.status(HttpStatus.CREATED).body(offreEmploiService.creerOffre(offreEmploi));
@@ -50,7 +61,7 @@ public class OffreEmploiController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
-        offreEmploiService.deleteOffre(id);
+    public String delete(@PathVariable long id) {
+        return offreEmploiService.deleteOffre(id);
     }
 }

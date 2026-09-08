@@ -1,7 +1,9 @@
 package com.HireHub.HireHub.service;
 
+import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
+import com.HireHub.HireHub.repository.CandidatureRepository;
 import com.HireHub.HireHub.repository.OffreEmploiRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,11 @@ import java.util.List;
 public class OffreEmploiService {
 
     private final OffreEmploiRepository offreEmploiRepository;
+    private final CandidatureRepository candidatureRepository;
 
-    public OffreEmploiService(OffreEmploiRepository offreEmploiRepository) {
+    public OffreEmploiService(OffreEmploiRepository offreEmploiRepository, CandidatureRepository candidatureRepository) {
         this.offreEmploiRepository = offreEmploiRepository;
+        this.candidatureRepository = candidatureRepository;
     }
 
     public OffreEmploi consulterOffreParId(long offreId) {
@@ -32,6 +36,14 @@ public class OffreEmploiService {
         return offreEmploiRepository.findByLocalisation(localisation);
     }
 
+    public List<OffreEmploi> listerOffresParRecruteur(long recruteurId) {
+        return offreEmploiRepository.findByRecruteurId(recruteurId);
+    }
+
+    public List<Candidature> listerCandidaturesParOffre(long offreId) {
+        return candidatureRepository.findByOffreId(offreId);
+    }
+
     public OffreEmploi creerOffre(OffreEmploi offreEmploi) {
         return offreEmploiRepository.save(offreEmploi);
     }
@@ -42,6 +54,6 @@ public class OffreEmploiService {
 
     public String deleteOffre(long offreId) {
         offreEmploiRepository.deleteById(offreId);
-        return "OffreEmploi deleted successfully";
+        return "Offre supprimée avec succès";
     }
 }
