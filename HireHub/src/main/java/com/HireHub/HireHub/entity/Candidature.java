@@ -2,7 +2,6 @@ package com.HireHub.HireHub.entity;
 
 import com.HireHub.HireHub.entity.enums.StatutCandidature;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.util.List;
 @Table(name = "candidatures")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Candidature {
 
     @Id

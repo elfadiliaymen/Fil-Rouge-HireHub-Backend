@@ -3,7 +3,6 @@ package com.HireHub.HireHub.entity;
 
 import com.HireHub.HireHub.entity.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class User {
 
     @Id
