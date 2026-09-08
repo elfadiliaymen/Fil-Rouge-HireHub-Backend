@@ -28,6 +28,10 @@ public class Cv {
     @Column(name = "chemin_fichier", nullable = false, length = 255)
     private String cheminFichier;
 
+    @Lob
+    @Column(name = "contenu")
+    private byte[] contenu;
+
     @Column(name = "date_upload", nullable = false)
     private LocalDateTime dateUpload;
 

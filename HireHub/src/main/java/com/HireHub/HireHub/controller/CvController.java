@@ -1,41 +1,89 @@
 package com.HireHub.HireHub.controller;
 
 import com.HireHub.HireHub.entity.Cv;
-import com.HireHub.HireHub.repository.CvRepository;
+import com.HireHub.HireHub.service.CvService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/cv")
 public class CvController {
-    private final CvRepository cvRepository;
 
-    public CvController(CvRepository cvRepository) {
-        this.cvRepository = cvRepository;
+    private final CvService cvService;
+
+    public CvController(CvService cvService) {
+        this.cvService = cvService;
     }
 
     @GetMapping
-    public List<Cv> findAll(){
-        return cvRepository.findAll();
+    public List<Cv> findAll() {
+        return cvService.listerAllCv();
+    }
+
+    @GetMapping("/{cvId}")
+    public Cv findById(@PathVariable long cvId) {
+        return cvService.consulterCVparId(cvId);
+    }
+
+    @GetMapping("/candidat/{candidatId}")
+    public List<Cv> findByCandidat(@PathVariable long candidatId) {
+        return cvService.listerCVParCandidat(candidatId);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<Cv> upload(@RequestParam long candidatId, @RequestParam("file") MultipartFile fichier) {
+        try {
+            Cv cv = cvService.uploadCv(candidatId, fichier);
+            return ResponseEntity.status(HttpStatus.CREATED).body(cv);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/upload/{cvId}")
+    public ResponseEntity<Cv> remplacer(@PathVariable long cvId, @RequestParam("file") MultipartFile fichier) {
+        try {
+            return ResponseEntity.ok(cvService.remplacerCv(cvId, fichier));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/download/{cvId}")
+    public ResponseEntity<byte[]> download(@PathVariable long cvId) {
+        Cv cv = cvService.consulterCVparId(cvId);
+        if (cv == null || cv.getContenu() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + cv.getNomFichier() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(cv.getContenu());
     }
 
     @PostMapping
-    public ResponseEntity<Cv> save(@RequestBody Cv cv){
-        return ResponseEntity.status(HttpStatus.CREATED).body(cvRepository.save(cv));
-    }
-
-    @DeleteMapping("/{cvId}")
-    public void delete(@PathVariable long cvId){
-        cvRepository.deleteById(cvId);
+    public ResponseEntity<Cv> save(@RequestBody Cv cv) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cvService.updateCv(cv));
     }
 
     @PutMapping
-    public ResponseEntity<Cv> update(@RequestBody Cv cv){
-        return ResponseEntity.ok(cvRepository.save(cv));
+    public ResponseEntity<Cv> update(@RequestBody Cv cv) {
+        return ResponseEntity.ok(cvService.updateCv(cv));
     }
 
-
+    @DeleteMapping("/{cvId}")
+    public String delete(@PathVariable long cvId) {
+        return cvService.deleteCv(cvId);
+    }
 }
