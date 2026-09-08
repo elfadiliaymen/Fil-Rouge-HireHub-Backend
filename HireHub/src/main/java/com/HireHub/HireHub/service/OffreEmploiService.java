@@ -55,19 +55,19 @@ public class OffreEmploiService {
     }
 
     public OffreResponse creerOffre(OffreRequest request) {
-        User recruteur = requeteUser(request.recruteurId());
+        User recruteur = requeteUser(request.getRecruteurId());
         OffreEmploi offre = DTOMapper.toOffre(request, recruteur);
         return DTOMapper.toOffreResponse(offreEmploiRepository.save(offre));
     }
 
     public OffreResponse updateOffre(long offreId, OffreRequest request) {
         OffreEmploi existant = requerirOffre(offreId);
-        existant.setTitre(request.titre());
-        existant.setDescription(request.description());
-        existant.setLocalisation(request.localisation());
-        existant.setTypeContrat(request.typeContrat());
-        existant.setDateLimite(request.dateLimite());
-        existant.setRecruteur(requeteUser(request.recruteurId()));
+        existant.setTitre(request.getTitre());
+        existant.setDescription(request.getDescription());
+        existant.setLocalisation(request.getLocalisation());
+        existant.setTypeContrat(request.getTypeContrat());
+        existant.setDateLimite(request.getDateLimite());
+        existant.setRecruteur(requeteUser(request.getRecruteurId()));
         return DTOMapper.toOffreResponse(offreEmploiRepository.save(existant));
     }
 

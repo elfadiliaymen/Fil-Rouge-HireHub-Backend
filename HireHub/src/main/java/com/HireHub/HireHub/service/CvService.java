@@ -52,7 +52,10 @@ public class CvService {
         if (cv.getContenu() == null) {
             throw new ResourceNotFoundException("Le CV n'a pas de contenu enregistré");
         }
-        return new CvFichier(cv.getNomFichier(), cv.getContenu());
+        CvFichier fichier = new CvFichier();
+        fichier.setNomFichier(cv.getNomFichier());
+        fichier.setContenu(cv.getContenu());
+        return fichier;
     }
 
     public CvResponse uploadCv(long candidatId, MultipartFile fichier) throws IOException {
@@ -80,15 +83,15 @@ public class CvService {
     }
 
     public CvResponse creerCv(CvRequest request) {
-        Cv cv = DTOMapper.toCv(request, requeteCandidat(request.candidatId()));
+        Cv cv = DTOMapper.toCv(request, requeteCandidat(request.getCandidatId()));
         return DTOMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public CvResponse updateCv(long cvId, CvRequest request) {
         Cv cv = requerirCv(cvId);
-        cv.setCandidat(requeteCandidat(request.candidatId()));
-        cv.setNomFichier(request.nomFichier());
-        cv.setCheminFichier(request.cheminFichier());
+        cv.setCandidat(requeteCandidat(request.getCandidatId()));
+        cv.setNomFichier(request.getNomFichier());
+        cv.setCheminFichier(request.getCheminFichier());
         return DTOMapper.toCvResponse(cvRepository.save(cv));
     }
 

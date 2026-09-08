@@ -52,23 +52,23 @@ public class EntretienService {
     }
 
     public EntretienResponse planifierEntretien(EntretienRequest request) {
-        Candidature candidature = candidatureRepository.findById(request.candidatureId())
-                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.candidatureId()));
-        User recruteur = userRepository.findById(request.recruteurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.recruteurId()));
+        Candidature candidature = candidatureRepository.findById(request.getCandidatureId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.getCandidatureId()));
+        User recruteur = userRepository.findById(request.getRecruteurId())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.getRecruteurId()));
         Entretien entretien = DTOMapper.toEntretien(request, candidature, recruteur);
         return DTOMapper.toEntretienResponse(entretienRepository.save(entretien));
     }
 
     public EntretienResponse updateEntretien(long entretienId, EntretienRequest request) {
         Entretien existant = requerirEntretien(entretienId);
-        existant.setDate(request.date());
-        existant.setHeure(request.heure());
-        existant.setLieu(request.lieu());
-        existant.setCandidature(candidatureRepository.findById(request.candidatureId())
-                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.candidatureId())));
-        existant.setRecruteur(userRepository.findById(request.recruteurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.recruteurId())));
+        existant.setDate(request.getDate());
+        existant.setHeure(request.getHeure());
+        existant.setLieu(request.getLieu());
+        existant.setCandidature(candidatureRepository.findById(request.getCandidatureId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.getCandidatureId())));
+        existant.setRecruteur(userRepository.findById(request.getRecruteurId())
+                .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.getRecruteurId())));
         return DTOMapper.toEntretienResponse(entretienRepository.save(existant));
     }
 

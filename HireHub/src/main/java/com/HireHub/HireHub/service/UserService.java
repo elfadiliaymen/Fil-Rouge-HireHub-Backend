@@ -60,20 +60,20 @@ public class UserService {
 
     public UserResponse updateUtilisateur(long id, UserRequest request) {
         User existant = requerirUtilisateur(id);
-        if (request.nom() != null) {
-            existant.setNom(request.nom());
+        if (request.getNom() != null) {
+            existant.setNom(request.getNom());
         }
-        if (request.prenom() != null) {
-            existant.setPrenom(request.prenom());
+        if (request.getPrenom() != null) {
+            existant.setPrenom(request.getPrenom());
         }
-        if (request.email() != null) {
-            existant.setEmail(request.email());
+        if (request.getEmail() != null) {
+            existant.setEmail(request.getEmail());
         }
-        if (request.password() != null) {
-            existant.setPassword(request.password());
+        if (request.getPassword() != null) {
+            existant.setPassword(request.getPassword());
         }
-        if (request.role() != null) {
-            existant.setRole(request.role());
+        if (request.getRole() != null) {
+            existant.setRole(request.getRole());
         }
         return DTOMapper.toUserResponse(userRepository.save(existant));
     }

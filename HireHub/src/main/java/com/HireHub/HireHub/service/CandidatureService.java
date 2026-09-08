@@ -51,10 +51,10 @@ public class CandidatureService {
     }
 
     public CandidatureResponse soumettreCandidature(CandidatureRequest request) {
-        User candidat = userRepository.findById(request.candidatId())
-                .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable avec l'id " + request.candidatId()));
-        OffreEmploi offre = offreEmploiRepository.findById(request.offreId())
-                .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable avec l'id " + request.offreId()));
+        User candidat = userRepository.findById(request.getCandidatId())
+                .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable avec l'id " + request.getCandidatId()));
+        OffreEmploi offre = offreEmploiRepository.findById(request.getOffreId())
+                .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable avec l'id " + request.getOffreId()));
         Candidature candidature = DTOMapper.toCandidature(request, candidat, offre);
         return DTOMapper.toCandidatureResponse(candidatureRepository.save(candidature));
     }

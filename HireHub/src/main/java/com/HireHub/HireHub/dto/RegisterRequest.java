@@ -1,8 +1,14 @@
 package com.HireHub.HireHub.dto;
 
-public record RegisterRequest(
-        String nom,
-        String prenom,
-        String email,
-        String password) {
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class RegisterRequest {
+
+    private String nom;
+    private String prenom;
+    private String email;
+    private String password;
 }

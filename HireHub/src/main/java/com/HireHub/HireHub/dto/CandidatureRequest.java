@@ -1,6 +1,12 @@
 package com.HireHub.HireHub.dto;
 
-public record CandidatureRequest(
-        long candidatId,
-        long offreId) {
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class CandidatureRequest {
+
+    private long candidatId;
+    private long offreId;
 }

@@ -25,16 +25,19 @@ class CvControllerTest {
     void shouldCreateCvFromJson() {
         CvController controller = new CvController(new CvService(repositoryProxy(1L), userRepositoryProxy(1L)));
 
-        CvRequest request = new CvRequest(1L, "myfirstcv01", "downloads/doc");
+        CvRequest request = new CvRequest();
+        request.setCandidatId(1L);
+        request.setNomFichier("myfirstcv01");
+        request.setCheminFichier("downloads/doc");
 
         ResponseEntity<CvResponse> response = controller.save(request);
 
         assertNotNull(response);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().id());
-        assertEquals("myfirstcv01", response.getBody().nomFichier());
-        assertEquals("downloads/doc", response.getBody().cheminFichier());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("myfirstcv01", response.getBody().getNomFichier());
+        assertEquals("downloads/doc", response.getBody().getCheminFichier());
     }
 
     private CvRepository repositoryProxy(long generatedId) {

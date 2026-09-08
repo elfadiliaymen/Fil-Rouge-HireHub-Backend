@@ -56,9 +56,9 @@ public class CvController {
     public ResponseEntity<byte[]> download(@PathVariable long cvId) {
         CvFichier cvFichier = cvService.telechargerCv(cvId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + cvFichier.nomFichier() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + cvFichier.getNomFichier() + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(cvFichier.contenu());
+                .body(cvFichier.getContenu());
     }
 
     @PostMapping
