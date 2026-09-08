@@ -18,6 +18,10 @@ public class Cv {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidat_id", nullable = false)
+    private User candidat;
+
     @Column(name = "nom_fichier", nullable = false, length = 255)
     private String nomFichier;
 

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "offres_emploi")
@@ -34,4 +36,11 @@ public class OffreEmploi {
 
     @Column(name = "date_limite", nullable = false)
     private LocalDate dateLimite;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recruteur_id", nullable = false)
+    private User recruteur;
+
+    @OneToMany(mappedBy = "offre")
+    private List<Candidature> candidatures = new ArrayList<>();
 }

@@ -29,4 +29,13 @@ public class Entretien {
 
     @Column(nullable = false, length = 150)
     private String lieu;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidature_id", nullable = false)
+    private Candidature candidature;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recruteur_id", nullable = false)
+    private User recruteur;
+
 }

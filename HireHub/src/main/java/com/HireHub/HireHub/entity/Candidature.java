@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "candidatures")
@@ -25,6 +27,17 @@ public class Candidature {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private StatutCandidature statut;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidat_id", nullable = false)
+    private User candidat;
+
+    @OneToMany(mappedBy = "candidature")
+    private List<Entretien> entretiens = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "offre_id", nullable = false)
+    private OffreEmploi offre;
 
     @PrePersist
     protected void onCreate() {
