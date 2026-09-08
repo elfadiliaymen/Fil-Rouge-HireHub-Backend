@@ -1,6 +1,7 @@
 package com.HireHub.HireHub.entity;
 
 import com.HireHub.HireHub.entity.enums.TypeContrat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,7 @@ public class OffreEmploi {
     @JoinColumn(name = "recruteur_id", nullable = false)
     private User recruteur;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "offre")
     private List<Candidature> candidatures = new ArrayList<>();
 }
