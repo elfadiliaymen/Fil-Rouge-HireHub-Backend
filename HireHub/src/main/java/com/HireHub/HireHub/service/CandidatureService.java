@@ -28,6 +28,14 @@ public class CandidatureService {
         return candidatureRepository.findByStatut(statut);
     }
 
+    public List<Candidature> listerCandidaturesParCandidat(long candidatId) {
+        return candidatureRepository.findByCandidatId(candidatId);
+    }
+
+    public List<Candidature> listerCandidaturesParOffre(long offreId) {
+        return candidatureRepository.findByOffreId(offreId);
+    }
+
     public Candidature soumettreCandidature(Candidature candidature) {
         return candidatureRepository.save(candidature);
     }
@@ -36,8 +44,17 @@ public class CandidatureService {
         return candidatureRepository.save(candidature);
     }
 
+    public Candidature changerStatut(long candidatureId, StatutCandidature statut) {
+        Candidature candidature = consulterCandidatureParId(candidatureId);
+        if (candidature == null) {
+            return null;
+        }
+        candidature.setStatut(statut);
+        return candidatureRepository.save(candidature);
+    }
+
     public String deleteCandidature(long candidatureId) {
         candidatureRepository.deleteById(candidatureId);
-        return "Candidature deleted successfully";
+        return "Candidature supprimée avec succès";
     }
 }

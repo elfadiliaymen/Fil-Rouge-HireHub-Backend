@@ -29,6 +29,16 @@ public class CandidatureController {
         return candidatureService.consulterCandidatureParId(id);
     }
 
+    @GetMapping("/candidat/{candidatId}")
+    public List<Candidature> findByCandidat(@PathVariable long candidatId) {
+        return candidatureService.listerCandidaturesParCandidat(candidatId);
+    }
+
+    @GetMapping("/offre/{offreId}")
+    public List<Candidature> findByOffre(@PathVariable long offreId) {
+        return candidatureService.listerCandidaturesParOffre(offreId);
+    }
+
     @GetMapping("/statut/{statut}")
     public List<Candidature> findByStatut(@PathVariable StatutCandidature statut) {
         return candidatureService.listerCandidaturesParStatut(statut);
@@ -44,8 +54,32 @@ public class CandidatureController {
         return ResponseEntity.ok(candidatureService.updateCandidature(candidature));
     }
 
+    @PatchMapping("/{id}/statut/{statut}")
+    public ResponseEntity<Candidature> changerStatut(@PathVariable long id, @PathVariable StatutCandidature statut) {
+        Candidature miseAJour = candidatureService.changerStatut(id, statut);
+        if (miseAJour == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(miseAJour);
+    }
+
+    @PatchMapping("/{id}/accepter")
+    public ResponseEntity<Candidature> accepter(@PathVariable long id) {
+        return ResponseEntity.ok(candidatureService.changerStatut(id, StatutCandidature.ACCEPTEE));
+    }
+
+    @PatchMapping("/{id}/refuser")
+    public ResponseEntity<Candidature> refuser(@PathVariable long id) {
+        return ResponseEntity.ok(candidatureService.changerStatut(id, StatutCandidature.REFUSEE));
+    }
+
+    @PatchMapping("/{id}/en-attente")
+    public ResponseEntity<Candidature> enAttente(@PathVariable long id) {
+        return ResponseEntity.ok(candidatureService.changerStatut(id, StatutCandidature.EN_ATTENTE));
+    }
+
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id) {
-        candidatureService.deleteCandidature(id);
+    public String delete(@PathVariable long id) {
+        return candidatureService.deleteCandidature(id);
     }
 }
