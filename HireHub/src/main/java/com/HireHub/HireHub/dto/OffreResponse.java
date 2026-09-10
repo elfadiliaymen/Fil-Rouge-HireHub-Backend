@@ -16,5 +16,6 @@ public class OffreResponse {
     private String localisation;
     private TypeContrat typeContrat;
     private LocalDate dateLimite;
+    private long recruteurId;
     private UserResponse recruteur;
 }

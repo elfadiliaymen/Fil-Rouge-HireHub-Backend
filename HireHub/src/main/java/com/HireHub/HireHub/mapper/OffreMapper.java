@@ -21,6 +21,7 @@ public final class OffreMapper {
         response.setLocalisation(offre.getLocalisation());
         response.setTypeContrat(offre.getTypeContrat());
         response.setDateLimite(offre.getDateLimite());
+        response.setRecruteurId(offre.getRecruteur().getId());
         response.setRecruteur(UserMapper.toUserResponse(offre.getRecruteur()));
         return response;
     }
