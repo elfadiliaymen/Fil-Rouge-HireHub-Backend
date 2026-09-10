@@ -2,7 +2,7 @@ package com.HireHub.HireHub.service;
 
 import com.HireHub.HireHub.dto.CandidatureRequest;
 import com.HireHub.HireHub.dto.CandidatureResponse;
-import com.HireHub.HireHub.dto.DTOMapper;
+import com.HireHub.HireHub.mapper.DTOMapper;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;

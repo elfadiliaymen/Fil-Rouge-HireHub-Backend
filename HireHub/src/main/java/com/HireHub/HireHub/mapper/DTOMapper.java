@@ -1,5 +1,16 @@
-package com.HireHub.HireHub.dto;
+package com.HireHub.HireHub.mapper;
 
+import com.HireHub.HireHub.dto.CandidatureRequest;
+import com.HireHub.HireHub.dto.CandidatureResponse;
+import com.HireHub.HireHub.dto.CvRequest;
+import com.HireHub.HireHub.dto.CvResponse;
+import com.HireHub.HireHub.dto.EntretienRequest;
+import com.HireHub.HireHub.dto.EntretienResponse;
+import com.HireHub.HireHub.dto.OffreRequest;
+import com.HireHub.HireHub.dto.OffreResponse;
+import com.HireHub.HireHub.dto.RegisterRequest;
+import com.HireHub.HireHub.dto.UserRequest;
+import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.Entretien;

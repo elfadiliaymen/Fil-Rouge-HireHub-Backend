@@ -1,6 +1,6 @@
 package com.HireHub.HireHub.service;
 
-import com.HireHub.HireHub.dto.DTOMapper;
+import com.HireHub.HireHub.mapper.DTOMapper;
 import com.HireHub.HireHub.dto.RegisterRequest;
 import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;

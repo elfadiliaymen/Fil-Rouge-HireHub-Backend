@@ -3,7 +3,7 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.dto.CvFichier;
 import com.HireHub.HireHub.dto.CvRequest;
 import com.HireHub.HireHub.dto.CvResponse;
-import com.HireHub.HireHub.dto.DTOMapper;
+import com.HireHub.HireHub.mapper.DTOMapper;
 import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.exception.ResourceNotFoundException;
