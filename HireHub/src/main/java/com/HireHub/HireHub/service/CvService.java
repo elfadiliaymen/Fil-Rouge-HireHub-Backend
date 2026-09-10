@@ -3,7 +3,7 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.dto.CvFichier;
 import com.HireHub.HireHub.dto.CvRequest;
 import com.HireHub.HireHub.dto.CvResponse;
-import com.HireHub.HireHub.mapper.DTOMapper;
+import com.HireHub.HireHub.mapper.CvMapper;
 import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.exception.ResourceNotFoundException;
@@ -28,7 +28,7 @@ public class CvService {
     }
 
     public CvResponse consulterCVparId(long cvId) {
-        return DTOMapper.toCvResponse(requerirCv(cvId));
+        return CvMapper.toCvResponse(requerirCv(cvId));
     }
 
     public CvResponse consulterCVparNom(String cvNom) {
@@ -36,15 +36,15 @@ public class CvService {
         if (cv == null) {
             throw new ResourceNotFoundException("CV introuvable avec le nom " + cvNom);
         }
-        return DTOMapper.toCvResponse(cv);
+        return CvMapper.toCvResponse(cv);
     }
 
     public Page<CvResponse> listerAllCv(Pageable pageable) {
-        return cvRepository.findAll(pageable).map(DTOMapper::toCvResponse);
+        return cvRepository.findAll(pageable).map(CvMapper::toCvResponse);
     }
 
     public Page<CvResponse> listerCVParCandidat(long candidatId, Pageable pageable) {
-        return cvRepository.findByCandidatId(candidatId, pageable).map(DTOMapper::toCvResponse);
+        return cvRepository.findByCandidatId(candidatId, pageable).map(CvMapper::toCvResponse);
     }
 
     public CvFichier telechargerCv(long cvId) {
@@ -68,7 +68,7 @@ public class CvService {
         cv.setNomFichier(fichier.getOriginalFilename());
         cv.setCheminFichier("uploads/cv");
         cv.setContenu(fichier.getBytes());
-        return DTOMapper.toCvResponse(cvRepository.save(cv));
+        return CvMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public CvResponse remplacerCv(long cvId, MultipartFile fichier) throws IOException {
@@ -79,12 +79,12 @@ public class CvService {
         cv.setNomFichier(fichier.getOriginalFilename());
         cv.setCheminFichier("uploads/cv");
         cv.setContenu(fichier.getBytes());
-        return DTOMapper.toCvResponse(cvRepository.save(cv));
+        return CvMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public CvResponse creerCv(CvRequest request) {
-        Cv cv = DTOMapper.toCv(request, requeteCandidat(request.getCandidatId()));
-        return DTOMapper.toCvResponse(cvRepository.save(cv));
+        Cv cv = CvMapper.toCv(request, requeteCandidat(request.getCandidatId()));
+        return CvMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public CvResponse updateCv(long cvId, CvRequest request) {
@@ -92,7 +92,7 @@ public class CvService {
         cv.setCandidat(requeteCandidat(request.getCandidatId()));
         cv.setNomFichier(request.getNomFichier());
         cv.setCheminFichier(request.getCheminFichier());
-        return DTOMapper.toCvResponse(cvRepository.save(cv));
+        return CvMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public String deleteCv(long cvId) {

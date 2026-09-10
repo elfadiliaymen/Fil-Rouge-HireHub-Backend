@@ -2,7 +2,7 @@ package com.HireHub.HireHub.service;
 
 import com.HireHub.HireHub.dto.CandidatureRequest;
 import com.HireHub.HireHub.dto.CandidatureResponse;
-import com.HireHub.HireHub.mapper.DTOMapper;
+import com.HireHub.HireHub.mapper.CandidatureMapper;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
@@ -31,23 +31,23 @@ public class CandidatureService {
     }
 
     public CandidatureResponse consulterCandidatureParId(long candidatureId) {
-        return DTOMapper.toCandidatureResponse(requerirCandidature(candidatureId));
+        return CandidatureMapper.toCandidatureResponse(requerirCandidature(candidatureId));
     }
 
     public Page<CandidatureResponse> listerToutesLesCandidatures(Pageable pageable) {
-        return candidatureRepository.findAll(pageable).map(DTOMapper::toCandidatureResponse);
+        return candidatureRepository.findAll(pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public Page<CandidatureResponse> listerCandidaturesParStatut(StatutCandidature statut, Pageable pageable) {
-        return candidatureRepository.findByStatut(statut, pageable).map(DTOMapper::toCandidatureResponse);
+        return candidatureRepository.findByStatut(statut, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public Page<CandidatureResponse> listerCandidaturesParCandidat(long candidatId, Pageable pageable) {
-        return candidatureRepository.findByCandidatId(candidatId, pageable).map(DTOMapper::toCandidatureResponse);
+        return candidatureRepository.findByCandidatId(candidatId, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public Page<CandidatureResponse> listerCandidaturesParOffre(long offreId, Pageable pageable) {
-        return candidatureRepository.findByOffreId(offreId, pageable).map(DTOMapper::toCandidatureResponse);
+        return candidatureRepository.findByOffreId(offreId, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public CandidatureResponse soumettreCandidature(CandidatureRequest request) {
@@ -55,14 +55,14 @@ public class CandidatureService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable avec l'id " + request.getCandidatId()));
         OffreEmploi offre = offreEmploiRepository.findById(request.getOffreId())
                 .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable avec l'id " + request.getOffreId()));
-        Candidature candidature = DTOMapper.toCandidature(request, candidat, offre);
-        return DTOMapper.toCandidatureResponse(candidatureRepository.save(candidature));
+        Candidature candidature = CandidatureMapper.toCandidature(request, candidat, offre);
+        return CandidatureMapper.toCandidatureResponse(candidatureRepository.save(candidature));
     }
 
     public CandidatureResponse changerStatut(long candidatureId, StatutCandidature statut) {
         Candidature candidature = requerirCandidature(candidatureId);
         candidature.setStatut(statut);
-        return DTOMapper.toCandidatureResponse(candidatureRepository.save(candidature));
+        return CandidatureMapper.toCandidatureResponse(candidatureRepository.save(candidature));
     }
 
     public String deleteCandidature(long candidatureId) {

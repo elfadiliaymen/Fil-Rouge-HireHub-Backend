@@ -1,6 +1,6 @@
 package com.HireHub.HireHub.service;
 
-import com.HireHub.HireHub.mapper.DTOMapper;
+import com.HireHub.HireHub.mapper.UserMapper;
 import com.HireHub.HireHub.dto.RegisterRequest;
 import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;
@@ -25,7 +25,7 @@ public class UserService {
     }
 
     public Page<UserResponse> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(DTOMapper::toUserResponse);
+        return userRepository.findAll(pageable).map(UserMapper::toUserResponse);
     }
 
     public UserResponse getUserByEmail(String email) {
@@ -33,7 +33,7 @@ public class UserService {
         if (user == null) {
             throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
         }
-        return DTOMapper.toUserResponse(user);
+        return UserMapper.toUserResponse(user);
     }
 
     public UserResponse getUserByNom(String nom) {
@@ -41,21 +41,21 @@ public class UserService {
         if (user == null) {
             throw new ResourceNotFoundException("Utilisateur introuvable avec le nom " + nom);
         }
-        return DTOMapper.toUserResponse(user);
+        return UserMapper.toUserResponse(user);
     }
 
     public UserResponse getUserById(long id) {
-        return DTOMapper.toUserResponse(requerirUtilisateur(id));
+        return UserMapper.toUserResponse(requerirUtilisateur(id));
     }
 
     public UserResponse creerUtilisateur(UserRequest request) {
-        User user = DTOMapper.toUser(request);
-        return DTOMapper.toUserResponse(userRepository.save(user));
+        User user = UserMapper.toUser(request);
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     public UserResponse inscrire(RegisterRequest request) {
-        User user = DTOMapper.toUser(request);
-        return DTOMapper.toUserResponse(userRepository.save(user));
+        User user = UserMapper.toUser(request);
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     public UserResponse updateUtilisateur(long id, UserRequest request) {
@@ -75,19 +75,19 @@ public class UserService {
         if (request.getRole() != null) {
             existant.setRole(request.getRole());
         }
-        return DTOMapper.toUserResponse(userRepository.save(existant));
+        return UserMapper.toUserResponse(userRepository.save(existant));
     }
 
     public UserResponse activer(long id) {
         User user = requerirUtilisateur(id);
         user.setActive(true);
-        return DTOMapper.toUserResponse(userRepository.save(user));
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     public UserResponse desactiver(long id) {
         User user = requerirUtilisateur(id);
         user.setActive(false);
-        return DTOMapper.toUserResponse(userRepository.save(user));
+        return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     public String deleteUtilisateur(long id) {
@@ -96,7 +96,7 @@ public class UserService {
     }
 
     public Page<UserResponse> listerParRole(Role role, Pageable pageable) {
-        return userRepository.findByRole(role, pageable).map(DTOMapper::toUserResponse);
+        return userRepository.findByRole(role, pageable).map(UserMapper::toUserResponse);
     }
 
     public Map<String, Long> statistiques() {

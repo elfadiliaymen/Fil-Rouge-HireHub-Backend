@@ -1,7 +1,8 @@
 package com.HireHub.HireHub.service;
 
 import com.HireHub.HireHub.dto.CandidatureResponse;
-import com.HireHub.HireHub.mapper.DTOMapper;
+import com.HireHub.HireHub.mapper.CandidatureMapper;
+import com.HireHub.HireHub.mapper.OffreMapper;
 import com.HireHub.HireHub.dto.OffreRequest;
 import com.HireHub.HireHub.dto.OffreResponse;
 import com.HireHub.HireHub.entity.OffreEmploi;
@@ -31,33 +32,33 @@ public class OffreEmploiService {
     }
 
     public OffreResponse consulterOffreParId(long offreId) {
-        return DTOMapper.toOffreResponse(requerirOffre(offreId));
+        return OffreMapper.toOffreResponse(requerirOffre(offreId));
     }
 
     public Page<OffreResponse> listerToutesLesOffres(Pageable pageable) {
-        return offreEmploiRepository.findAll(pageable).map(DTOMapper::toOffreResponse);
+        return offreEmploiRepository.findAll(pageable).map(OffreMapper::toOffreResponse);
     }
 
     public Page<OffreResponse> listerOffresParTypeContrat(TypeContrat typeContrat, Pageable pageable) {
-        return offreEmploiRepository.findByTypeContrat(typeContrat, pageable).map(DTOMapper::toOffreResponse);
+        return offreEmploiRepository.findByTypeContrat(typeContrat, pageable).map(OffreMapper::toOffreResponse);
     }
 
     public Page<OffreResponse> listerOffresParLocalisation(String localisation, Pageable pageable) {
-        return offreEmploiRepository.findByLocalisation(localisation, pageable).map(DTOMapper::toOffreResponse);
+        return offreEmploiRepository.findByLocalisation(localisation, pageable).map(OffreMapper::toOffreResponse);
     }
 
     public Page<OffreResponse> listerOffresParRecruteur(long recruteurId, Pageable pageable) {
-        return offreEmploiRepository.findByRecruteurId(recruteurId, pageable).map(DTOMapper::toOffreResponse);
+        return offreEmploiRepository.findByRecruteurId(recruteurId, pageable).map(OffreMapper::toOffreResponse);
     }
 
     public Page<CandidatureResponse> listerCandidaturesParOffre(long offreId, Pageable pageable) {
-        return candidatureRepository.findByOffreId(offreId, pageable).map(DTOMapper::toCandidatureResponse);
+        return candidatureRepository.findByOffreId(offreId, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public OffreResponse creerOffre(OffreRequest request) {
         User recruteur = requeteUser(request.getRecruteurId());
-        OffreEmploi offre = DTOMapper.toOffre(request, recruteur);
-        return DTOMapper.toOffreResponse(offreEmploiRepository.save(offre));
+        OffreEmploi offre = OffreMapper.toOffre(request, recruteur);
+        return OffreMapper.toOffreResponse(offreEmploiRepository.save(offre));
     }
 
     public OffreResponse updateOffre(long offreId, OffreRequest request) {
@@ -68,7 +69,7 @@ public class OffreEmploiService {
         existant.setTypeContrat(request.getTypeContrat());
         existant.setDateLimite(request.getDateLimite());
         existant.setRecruteur(requeteUser(request.getRecruteurId()));
-        return DTOMapper.toOffreResponse(offreEmploiRepository.save(existant));
+        return OffreMapper.toOffreResponse(offreEmploiRepository.save(existant));
     }
 
     public String deleteOffre(long offreId) {

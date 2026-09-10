@@ -1,6 +1,6 @@
 package com.HireHub.HireHub.service;
 
-import com.HireHub.HireHub.mapper.DTOMapper;
+import com.HireHub.HireHub.mapper.EntretienMapper;
 import com.HireHub.HireHub.dto.EntretienRequest;
 import com.HireHub.HireHub.dto.EntretienResponse;
 import com.HireHub.HireHub.entity.Candidature;
@@ -32,23 +32,23 @@ public class EntretienService {
     }
 
     public EntretienResponse consulterEntretienParId(long entretienId) {
-        return DTOMapper.toEntretienResponse(requerirEntretien(entretienId));
+        return EntretienMapper.toEntretienResponse(requerirEntretien(entretienId));
     }
 
     public Page<EntretienResponse> listerTousLesEntretiens(Pageable pageable) {
-        return entretienRepository.findAll(pageable).map(DTOMapper::toEntretienResponse);
+        return entretienRepository.findAll(pageable).map(EntretienMapper::toEntretienResponse);
     }
 
     public Page<EntretienResponse> listerEntretiensParDate(LocalDate date, Pageable pageable) {
-        return entretienRepository.findByDate(date, pageable).map(DTOMapper::toEntretienResponse);
+        return entretienRepository.findByDate(date, pageable).map(EntretienMapper::toEntretienResponse);
     }
 
     public Page<EntretienResponse> listerEntretiensParRecruteur(long recruteurId, Pageable pageable) {
-        return entretienRepository.findByRecruteurId(recruteurId, pageable).map(DTOMapper::toEntretienResponse);
+        return entretienRepository.findByRecruteurId(recruteurId, pageable).map(EntretienMapper::toEntretienResponse);
     }
 
     public Page<EntretienResponse> listerEntretiensParCandidature(long candidatureId, Pageable pageable) {
-        return entretienRepository.findByCandidatureId(candidatureId, pageable).map(DTOMapper::toEntretienResponse);
+        return entretienRepository.findByCandidatureId(candidatureId, pageable).map(EntretienMapper::toEntretienResponse);
     }
 
     public EntretienResponse planifierEntretien(EntretienRequest request) {
@@ -56,8 +56,8 @@ public class EntretienService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.getCandidatureId()));
         User recruteur = userRepository.findById(request.getRecruteurId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.getRecruteurId()));
-        Entretien entretien = DTOMapper.toEntretien(request, candidature, recruteur);
-        return DTOMapper.toEntretienResponse(entretienRepository.save(entretien));
+        Entretien entretien = EntretienMapper.toEntretien(request, candidature, recruteur);
+        return EntretienMapper.toEntretienResponse(entretienRepository.save(entretien));
     }
 
     public EntretienResponse updateEntretien(long entretienId, EntretienRequest request) {
@@ -69,7 +69,7 @@ public class EntretienService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.getCandidatureId())));
         existant.setRecruteur(userRepository.findById(request.getRecruteurId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recruteur introuvable avec l'id " + request.getRecruteurId())));
-        return DTOMapper.toEntretienResponse(entretienRepository.save(existant));
+        return EntretienMapper.toEntretienResponse(entretienRepository.save(existant));
     }
 
     public String deleteEntretien(long entretienId) {
