@@ -5,6 +5,7 @@ import com.HireHub.HireHub.dto.OffreResponse;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
+import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.repository.CandidatureRepository;
 import com.HireHub.HireHub.repository.OffreEmploiRepository;
 import com.HireHub.HireHub.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +58,10 @@ class OffreEmploiServiceTest {
         OffreEmploi offre = new OffreEmploi();
         offre.setId(1L);
         offre.setTitre("Développeur Java");
+        offre.setDescription("Développeur Java expérimenté");
+        offre.setLocalisation("Paris");
+        offre.setTypeContrat(TypeContrat.CDI);
+        offre.setDateLimite(LocalDate.now().plusDays(30));
         offre.setRecruteur(recruteur);
 
         Page<OffreEmploi> page =
