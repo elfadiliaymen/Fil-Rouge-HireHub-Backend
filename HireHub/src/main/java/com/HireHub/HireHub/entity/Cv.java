@@ -27,7 +27,7 @@ public class Cv {
     private String cheminFichier;
 
     @Lob
-    @Column(name = "contenu")
+    @Column(name = "contenu", columnDefinition = "LONGBLOB")
     private byte[] contenu;
 
     @Column(name = "date_upload", nullable = false)
