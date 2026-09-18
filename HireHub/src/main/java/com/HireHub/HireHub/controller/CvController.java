@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,17 +37,20 @@ public class CvController {
         return cvService.consulterCVparId(cvId);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @GetMapping("/candidat/{candidatId}")
     public Page<CvResponse> findByCandidat(@PathVariable long candidatId,
                                            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return cvService.listerCVParCandidat(candidatId, pageable);
     }
 
+    @PreAuthorize("hasRole('CANDIDAT')")
     @PostMapping("/upload")
     public CvResponse upload(@RequestParam long candidatId, @RequestParam("file") MultipartFile fichier) throws IOException {
         return cvService.uploadCv(candidatId, fichier);
     }
 
+    @PreAuthorize("hasRole('CANDIDAT')")
     @PutMapping("/upload/{cvId}")
     public CvResponse remplacer(@PathVariable long cvId, @RequestParam("file") MultipartFile fichier) throws IOException {
         return cvService.remplacerCv(cvId, fichier);
@@ -61,16 +65,19 @@ public class CvController {
                 .body(cvFichier.getContenu());
     }
 
+    @PreAuthorize("hasRole('CANDIDAT')")
     @PostMapping
     public ResponseEntity<CvResponse> save(@RequestBody CvRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cvService.creerCv(request));
     }
 
+    @PreAuthorize("hasRole('CANDIDAT')")
     @PutMapping("/{cvId}")
     public CvResponse update(@PathVariable long cvId, @RequestBody CvRequest request) {
         return cvService.updateCv(cvId, request);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @DeleteMapping("/{cvId}")
     public String delete(@PathVariable long cvId) {
         return cvService.deleteCv(cvId);
