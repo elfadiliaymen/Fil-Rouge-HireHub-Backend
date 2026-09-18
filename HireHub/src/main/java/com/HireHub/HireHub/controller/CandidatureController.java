@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,22 +22,26 @@ public class CandidatureController {
         this.candidatureService = candidatureService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping
     public Page<CandidatureResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return candidatureService.listerToutesLesCandidatures(pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/{id}")
     public CandidatureResponse findById(@PathVariable long id) {
         return candidatureService.consulterCandidatureParId(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/candidat/{candidatId}")
     public Page<CandidatureResponse> findByCandidat(@PathVariable long candidatId,
                                                     @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return candidatureService.listerCandidaturesParCandidat(candidatId, pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/offre/{offreId}")
     public Page<CandidatureResponse> findByOffre(@PathVariable long offreId,
                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {

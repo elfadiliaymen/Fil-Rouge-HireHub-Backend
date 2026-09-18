@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class EntretienController {
         return entretienService.listerEntretiensParDate(date, pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/recruteur/{recruteurId}")
     public Page<EntretienResponse> findByRecruteur(@PathVariable long recruteurId,
                                                    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -50,16 +52,19 @@ public class EntretienController {
         return entretienService.listerEntretiensParCandidature(candidatureId, pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PostMapping
     public ResponseEntity<EntretienResponse> save(@RequestBody EntretienRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(entretienService.planifierEntretien(request));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PutMapping("/{id}")
     public EntretienResponse update(@PathVariable long id, @RequestBody EntretienRequest request) {
         return entretienService.updateEntretien(id, request);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @DeleteMapping("/{id}")
     public String delete(@PathVariable long id) {
         return entretienService.deleteEntretien(id);
