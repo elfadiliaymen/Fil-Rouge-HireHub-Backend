@@ -21,6 +21,6 @@ public class UpdateProfileRequest {
 
     private LocalDate dateNaissance;
     private String niveauEtude;
-    private int experienceAnnees;
+    private Integer experienceAnnees;
     private String linkedinUrl;
 }

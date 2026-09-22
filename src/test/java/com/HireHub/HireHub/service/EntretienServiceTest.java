@@ -40,6 +40,9 @@ class EntretienServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private EntretienService entretienService;
 
@@ -149,7 +152,12 @@ class EntretienServiceTest {
 
     @Test
     void deleteEntretien() {
-        // Arrange & Act
+        // Arrange
+        Entretien entretien = new Entretien();
+        entretien.setId(1L);
+        when(entretienRepository.findById(1L)).thenReturn(Optional.of(entretien));
+
+        // Act
         String result = entretienService.deleteEntretien(1L);
 
         // Assert

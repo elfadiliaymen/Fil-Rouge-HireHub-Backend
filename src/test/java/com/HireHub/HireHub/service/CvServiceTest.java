@@ -34,6 +34,9 @@ class CvServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private CvService cvService;
 

@@ -39,6 +39,9 @@ class OffreEmploiServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private OffreEmploiService offreEmploiService;
 

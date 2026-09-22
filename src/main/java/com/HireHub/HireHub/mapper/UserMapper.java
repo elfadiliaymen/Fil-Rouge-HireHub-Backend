@@ -69,7 +69,7 @@ public final class UserMapper {
     private static void appliquerChampsProfil(User user, String telephone, String adresse,
                                               String entreprise, String poste, String telephonePro,
                                               LocalDate dateNaissance, String niveauEtude,
-                                              int experienceAnnees, String linkedinUrl) {
+                                              Integer experienceAnnees, String linkedinUrl) {
         user.setTelephone(telephone);
         user.setAdresse(adresse);
         user.setEntreprise(entreprise);
