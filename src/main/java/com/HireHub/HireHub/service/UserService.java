@@ -1,7 +1,9 @@
 package com.HireHub.HireHub.service;
 
 import com.HireHub.HireHub.mapper.UserMapper;
+import com.HireHub.HireHub.dto.ChangePasswordRequest;
 import com.HireHub.HireHub.dto.RegisterRequest;
+import com.HireHub.HireHub.dto.UpdateProfileRequest;
 import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.User;
@@ -75,6 +77,31 @@ public class UserService {
         if (request.getRole() != null) {
             existant.setRole(request.getRole());
         }
+        if (request.getTelephone() != null) {
+            existant.setTelephone(request.getTelephone());
+        }
+        if (request.getAdresse() != null) {
+            existant.setAdresse(request.getAdresse());
+        }
+        if (request.getEntreprise() != null) {
+            existant.setEntreprise(request.getEntreprise());
+        }
+        if (request.getPoste() != null) {
+            existant.setPoste(request.getPoste());
+        }
+        if (request.getTelephonePro() != null) {
+            existant.setTelephonePro(request.getTelephonePro());
+        }
+        if (request.getDateNaissance() != null) {
+            existant.setDateNaissance(request.getDateNaissance());
+        }
+        if (request.getNiveauEtude() != null) {
+            existant.setNiveauEtude(request.getNiveauEtude());
+        }
+        existant.setExperienceAnnees(request.getExperienceAnnees());
+        if (request.getLinkedinUrl() != null) {
+            existant.setLinkedinUrl(request.getLinkedinUrl());
+        }
         return UserMapper.toUserResponse(userRepository.save(existant));
     }
 
@@ -108,6 +135,69 @@ public class UserService {
         stats.put("recruteurs", userRepository.countByRole(Role.RECRUTEUR));
         stats.put("candidats", userRepository.countByRole(Role.CANDIDAT));
         return stats;
+    }
+
+    public UserResponse getMe(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
+        }
+        return UserMapper.toUserResponse(user);
+    }
+
+    public UserResponse updateMe(String email, UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
+        }
+        if (request.getNom() != null && !request.getNom().isBlank()) {
+            user.setNom(request.getNom());
+        }
+        if (request.getPrenom() != null && !request.getPrenom().isBlank()) {
+            user.setPrenom(request.getPrenom());
+        }
+        if (request.getTelephone() != null) {
+            user.setTelephone(request.getTelephone());
+        }
+        if (request.getAdresse() != null) {
+            user.setAdresse(request.getAdresse());
+        }
+        if (request.getEntreprise() != null) {
+            user.setEntreprise(request.getEntreprise());
+        }
+        if (request.getPoste() != null) {
+            user.setPoste(request.getPoste());
+        }
+        if (request.getTelephonePro() != null) {
+            user.setTelephonePro(request.getTelephonePro());
+        }
+        if (request.getDateNaissance() != null) {
+            user.setDateNaissance(request.getDateNaissance());
+        }
+        if (request.getNiveauEtude() != null) {
+            user.setNiveauEtude(request.getNiveauEtude());
+        }
+        user.setExperienceAnnees(request.getExperienceAnnees());
+        if (request.getLinkedinUrl() != null) {
+            user.setLinkedinUrl(request.getLinkedinUrl());
+        }
+        return UserMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public String changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
+        }
+        if (request.getOldPassword() == null || !user.getPassword().equals(request.getOldPassword())) {
+            throw new IllegalArgumentException("L'ancien mot de passe est incorrect");
+        }
+        if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            throw new IllegalArgumentException("Le nouveau mot de passe est obligatoire");
+        }
+        user.setPassword(request.getNewPassword());
+        userRepository.save(user);
+        return "Mot de passe modifié avec succès";
     }
 
     private User requerirUtilisateur(long id) {

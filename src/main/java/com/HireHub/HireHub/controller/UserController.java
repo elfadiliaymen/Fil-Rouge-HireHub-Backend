@@ -49,7 +49,6 @@ public class UserController {
         return userService.getUserByNom(nom);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/role/{role}")
     public Page<UserResponse> findByRole(@PathVariable Role role, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return userService.listerParRole(role, pageable);

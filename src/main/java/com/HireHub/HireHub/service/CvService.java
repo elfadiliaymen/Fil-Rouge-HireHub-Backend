@@ -21,10 +21,12 @@ public class CvService {
 
     private final CvRepository cvRepository;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public CvService(CvRepository cvRepository, UserRepository userRepository) {
+    public CvService(CvRepository cvRepository, UserRepository userRepository, CurrentUserService currentUserService) {
         this.cvRepository = cvRepository;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public CvResponse consulterCVparId(long cvId) {
@@ -59,6 +61,9 @@ public class CvService {
     }
 
     public CvResponse uploadCv(long candidatId, MultipartFile fichier) throws IOException {
+        if (currentUserService.isCandidat()) {
+            candidatId = currentUserService.get().getId();
+        }
         User candidat = requeteCandidat(candidatId);
         if (fichier.isEmpty() || !"application/pdf".equalsIgnoreCase(fichier.getContentType())) {
             throw new IllegalArgumentException("Le CV doit être un fichier PDF");
@@ -72,6 +77,7 @@ public class CvService {
     }
 
     public CvResponse remplacerCv(long cvId, MultipartFile fichier) throws IOException {
+        verifyOwner(cvId);
         Cv cv = requerirCv(cvId);
         if (fichier.isEmpty() || !"application/pdf".equalsIgnoreCase(fichier.getContentType())) {
             throw new IllegalArgumentException("Le CV doit être un fichier PDF");
@@ -83,12 +89,19 @@ public class CvService {
     }
 
     public CvResponse creerCv(CvRequest request) {
+        if (currentUserService.isCandidat()) {
+            request.setCandidatId(currentUserService.get().getId());
+        }
         Cv cv = CvMapper.toCv(request, requeteCandidat(request.getCandidatId()));
         return CvMapper.toCvResponse(cvRepository.save(cv));
     }
 
     public CvResponse updateCv(long cvId, CvRequest request) {
+        verifyOwner(cvId);
         Cv cv = requerirCv(cvId);
+        if (currentUserService.isCandidat()) {
+            request.setCandidatId(currentUserService.get().getId());
+        }
         cv.setCandidat(requeteCandidat(request.getCandidatId()));
         cv.setNomFichier(request.getNomFichier());
         cv.setCheminFichier(request.getCheminFichier());
@@ -96,8 +109,18 @@ public class CvService {
     }
 
     public String deleteCv(long cvId) {
+        verifyOwner(cvId);
         cvRepository.deleteById(cvId);
         return "CV supprimé avec succès";
+    }
+
+    private void verifyOwner(long cvId) {
+        if (currentUserService.isCandidat()) {
+            Cv cv = requerirCv(cvId);
+            if (cv.getCandidat().getId() != currentUserService.get().getId()) {
+                throw new ResourceNotFoundException("CV introuvable avec l'id " + cvId);
+            }
+        }
     }
 
     private Cv requerirCv(long cvId) {

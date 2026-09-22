@@ -6,6 +6,7 @@ import com.HireHub.HireHub.dto.EntretienResponse;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.Entretien;
 import com.HireHub.HireHub.entity.User;
+import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.exception.ResourceNotFoundException;
 import com.HireHub.HireHub.repository.CandidatureRepository;
 import com.HireHub.HireHub.repository.EntretienRepository;
@@ -22,13 +23,16 @@ public class EntretienService {
     private final EntretienRepository entretienRepository;
     private final CandidatureRepository candidatureRepository;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     public EntretienService(EntretienRepository entretienRepository,
                             CandidatureRepository candidatureRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            CurrentUserService currentUserService) {
         this.entretienRepository = entretienRepository;
         this.candidatureRepository = candidatureRepository;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     public EntretienResponse consulterEntretienParId(long entretienId) {
@@ -52,6 +56,9 @@ public class EntretienService {
     }
 
     public EntretienResponse planifierEntretien(EntretienRequest request) {
+        if (estRecruteurConnecte()) {
+            request.setRecruteurId(currentUserService.get().getId());
+        }
         Candidature candidature = candidatureRepository.findById(request.getCandidatureId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidature introuvable avec l'id " + request.getCandidatureId()));
         User recruteur = userRepository.findById(request.getRecruteurId())
@@ -62,6 +69,10 @@ public class EntretienService {
 
     public EntretienResponse updateEntretien(long entretienId, EntretienRequest request) {
         Entretien existant = requerirEntretien(entretienId);
+        verifierProprietaireOuAdmin(existant);
+        if (estRecruteurConnecte()) {
+            request.setRecruteurId(currentUserService.get().getId());
+        }
         existant.setDate(request.getDate());
         existant.setHeure(request.getHeure());
         existant.setLieu(request.getLieu());
@@ -73,8 +84,21 @@ public class EntretienService {
     }
 
     public String deleteEntretien(long entretienId) {
+        Entretien existant = requerirEntretien(entretienId);
+        verifierProprietaireOuAdmin(existant);
         entretienRepository.deleteById(entretienId);
         return "Entretien supprimé avec succès";
+    }
+
+    private boolean estRecruteurConnecte() {
+        return currentUserService.hasRole(Role.RECRUTEUR);
+    }
+
+    private void verifierProprietaireOuAdmin(Entretien entretien) {
+        if (estRecruteurConnecte()
+                && entretien.getRecruteur().getId() != currentUserService.get().getId()) {
+            throw new ResourceNotFoundException("Entretien introuvable avec l'id " + entretien.getId());
+        }
     }
 
     private Entretien requerirEntretien(long entretienId) {

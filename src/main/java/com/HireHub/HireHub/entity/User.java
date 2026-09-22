@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "users")
@@ -34,6 +36,32 @@ public class User {
     @Column(nullable = false)
     private boolean active;
 
+    @Column(length = 20)
+    private String telephone;
+
+    @Column(length = 255)
+    private String adresse;
+
+    @Column(length = 100)
+    private String entreprise;
+
+    @Column(length = 50)
+    private String poste;
+
+    @Column(length = 20)
+    private String telephonePro;
+
+    @Column
+    private LocalDate dateNaissance;
+
+    @Column(length = 50)
+    private String niveauEtude;
+
+    @Column
+    private Integer experienceAnnees;
+
+    @Column(length = 255)
+    private String linkedinUrl;
 
 
 }

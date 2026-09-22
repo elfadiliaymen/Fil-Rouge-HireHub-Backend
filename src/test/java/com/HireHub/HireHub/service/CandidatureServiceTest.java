@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +37,9 @@ class CandidatureServiceTest {
     @Mock
     private OffreEmploiRepository offreEmploiRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private CandidatureService candidatureService;
 
@@ -48,9 +50,6 @@ class CandidatureServiceTest {
         candidat.setId(1L);
         candidat.setNom("Dupont");
         candidat.setPrenom("Jean");
-        candidat.setEmail("jean.dupont@example.com");
-        candidat.setRole(Role.CANDIDAT);
-        candidat.setActive(true);
 
         OffreEmploi offre = new OffreEmploi();
         offre.setId(1L);
@@ -83,9 +82,6 @@ class CandidatureServiceTest {
         candidat.setId(1L);
         candidat.setNom("Dupont");
         candidat.setPrenom("Jean");
-        candidat.setEmail("jean.dupont@example.com");
-        candidat.setRole(Role.CANDIDAT);
-        candidat.setActive(true);
 
         OffreEmploi offre = new OffreEmploi();
         offre.setId(1L);

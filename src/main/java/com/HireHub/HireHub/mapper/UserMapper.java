@@ -6,6 +6,8 @@ import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 
+import java.time.LocalDate;
+
 public final class UserMapper {
 
     private UserMapper() {
@@ -22,6 +24,15 @@ public final class UserMapper {
         response.setEmail(user.getEmail());
         response.setRole(user.getRole());
         response.setActive(user.isActive());
+        response.setTelephone(user.getTelephone());
+        response.setAdresse(user.getAdresse());
+        response.setEntreprise(user.getEntreprise());
+        response.setPoste(user.getPoste());
+        response.setTelephonePro(user.getTelephonePro());
+        response.setDateNaissance(user.getDateNaissance());
+        response.setNiveauEtude(user.getNiveauEtude());
+        response.setExperienceAnnees(user.getExperienceAnnees());
+        response.setLinkedinUrl(user.getLinkedinUrl());
         return response;
     }
 
@@ -33,6 +44,10 @@ public final class UserMapper {
         user.setPassword(request.getPassword());
         user.setRole(request.getRole() != null ? request.getRole() : Role.CANDIDAT);
         user.setActive(true);
+        appliquerChampsProfil(user, request.getTelephone(), request.getAdresse(),
+                request.getEntreprise(), request.getPoste(), request.getTelephonePro(),
+                request.getDateNaissance(), request.getNiveauEtude(), request.getExperienceAnnees(),
+                request.getLinkedinUrl());
         return user;
     }
 
@@ -42,8 +57,27 @@ public final class UserMapper {
         user.setPrenom(request.getPrenom());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setRole(Role.CANDIDAT);
+        user.setRole(request.getRole() != null ? request.getRole() : Role.CANDIDAT);
         user.setActive(true);
+        appliquerChampsProfil(user, request.getTelephone(), request.getAdresse(),
+                request.getEntreprise(), request.getPoste(), request.getTelephonePro(),
+                request.getDateNaissance(), request.getNiveauEtude(), request.getExperienceAnnees(),
+                request.getLinkedinUrl());
         return user;
+    }
+
+    private static void appliquerChampsProfil(User user, String telephone, String adresse,
+                                              String entreprise, String poste, String telephonePro,
+                                              LocalDate dateNaissance, String niveauEtude,
+                                              int experienceAnnees, String linkedinUrl) {
+        user.setTelephone(telephone);
+        user.setAdresse(adresse);
+        user.setEntreprise(entreprise);
+        user.setPoste(poste);
+        user.setTelephonePro(telephonePro);
+        user.setDateNaissance(dateNaissance);
+        user.setNiveauEtude(niveauEtude);
+        user.setExperienceAnnees(experienceAnnees);
+        user.setLinkedinUrl(linkedinUrl);
     }
 }

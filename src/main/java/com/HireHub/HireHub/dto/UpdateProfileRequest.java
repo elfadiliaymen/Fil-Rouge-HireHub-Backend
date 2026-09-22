@@ -1,6 +1,5 @@
 package com.HireHub.HireHub.dto;
 
-import com.HireHub.HireHub.entity.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,13 +7,10 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-public class RegisterRequest {
+public class UpdateProfileRequest {
 
     private String nom;
     private String prenom;
-    private String email;
-    private String password;
-    private Role role;
 
     private String telephone;
     private String adresse;

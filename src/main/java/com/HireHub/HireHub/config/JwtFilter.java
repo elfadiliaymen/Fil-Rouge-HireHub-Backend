@@ -20,10 +20,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
     private final CustomUserDetailsService customUserDetailsService;
+    private final TokenBlacklist tokenBlacklist;
 
-    public JwtFilter(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService) {
+    public JwtFilter(JwtUtils jwtUtils, CustomUserDetailsService customUserDetailsService, TokenBlacklist tokenBlacklist) {
         this.jwtUtils = jwtUtils;
         this.customUserDetailsService = customUserDetailsService;
+        this.tokenBlacklist = tokenBlacklist;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            if (jwtUtils.validateToken(token)) {
+            if (!tokenBlacklist.contains(token) && jwtUtils.validateToken(token)) {
                 String email = jwtUtils.extractEmail(token);
                 String role = jwtUtils.extractUserRole(token);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);

@@ -21,17 +21,21 @@ public class CandidatureService {
     private final CandidatureRepository candidatureRepository;
     private final UserRepository userRepository;
     private final OffreEmploiRepository offreEmploiRepository;
+    private final CurrentUserService currentUserService;
 
     public CandidatureService(CandidatureRepository candidatureRepository,
                               UserRepository userRepository,
-                              OffreEmploiRepository offreEmploiRepository) {
+                              OffreEmploiRepository offreEmploiRepository,
+                              CurrentUserService currentUserService) {
         this.candidatureRepository = candidatureRepository;
         this.userRepository = userRepository;
         this.offreEmploiRepository = offreEmploiRepository;
+        this.currentUserService = currentUserService;
     }
 
     public CandidatureResponse consulterCandidatureParId(long candidatureId) {
-        return CandidatureMapper.toCandidatureResponse(requerirCandidature(candidatureId));
+        Candidature candidature = requerirCandidature(candidatureId);
+        return CandidatureMapper.toCandidatureResponse(candidature);
     }
 
     public Page<CandidatureResponse> listerToutesLesCandidatures(Pageable pageable) {
@@ -46,23 +50,37 @@ public class CandidatureService {
         return candidatureRepository.findByCandidatId(candidatId, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
+    public Page<CandidatureResponse> listerCandidaturesParRecruteur(long recruteurId, Pageable pageable) {
+        return candidatureRepository.findByOffreRecruteurId(recruteurId, pageable).map(CandidatureMapper::toCandidatureResponse);
+    }
+
     public Page<CandidatureResponse> listerCandidaturesParOffre(long offreId, Pageable pageable) {
         return candidatureRepository.findByOffreId(offreId, pageable).map(CandidatureMapper::toCandidatureResponse);
     }
 
     public CandidatureResponse soumettreCandidature(CandidatureRequest request) {
+        if (currentUserService.isCandidat()) {
+            request.setCandidatId(currentUserService.get().getId());
+        }
+
+        if (candidatureRepository.existsByCandidatIdAndOffreId(request.getCandidatId(), request.getOffreId())) {
+            throw new IllegalArgumentException("Vous avez déjà postulé à cette offre");
+        }
+
         User candidat = userRepository.findById(request.getCandidatId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidat introuvable avec l'id " + request.getCandidatId()));
         OffreEmploi offre = offreEmploiRepository.findById(request.getOffreId())
                 .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable avec l'id " + request.getOffreId()));
         Candidature candidature = CandidatureMapper.toCandidature(request, candidat, offre);
-        return CandidatureMapper.toCandidatureResponse(candidatureRepository.save(candidature));
+        Candidature saved = candidatureRepository.save(candidature);
+        return CandidatureMapper.toCandidatureResponse(saved);
     }
 
     public CandidatureResponse changerStatut(long candidatureId, StatutCandidature statut) {
         Candidature candidature = requerirCandidature(candidatureId);
         candidature.setStatut(statut);
-        return CandidatureMapper.toCandidatureResponse(candidatureRepository.save(candidature));
+        Candidature saved = candidatureRepository.save(candidature);
+        return CandidatureMapper.toCandidatureResponse(saved);
     }
 
     public String deleteCandidature(long candidatureId) {

@@ -23,16 +23,19 @@ public class EntretienController {
         this.entretienService = entretienService;
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping
     public Page<EntretienResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return entretienService.listerTousLesEntretiens(pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/{id}")
     public EntretienResponse findById(@PathVariable long id) {
         return entretienService.consulterEntretienParId(id);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/date/{date}")
     public Page<EntretienResponse> findByDate(@PathVariable LocalDate date,
                                               @PageableDefault(size = 10, sort = "id") Pageable pageable) {
@@ -46,6 +49,7 @@ public class EntretienController {
         return entretienService.listerEntretiensParRecruteur(recruteurId, pageable);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/candidature/{candidatureId}")
     public Page<EntretienResponse> findByCandidature(@PathVariable long candidatureId,
                                                      @PageableDefault(size = 10, sort = "id") Pageable pageable) {

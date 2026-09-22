@@ -9,5 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CandidatureRepository extends JpaRepository<Candidature, Long> {
     Page<Candidature> findByStatut(StatutCandidature statut, Pageable pageable);
     Page<Candidature> findByCandidatId(long candidatId, Pageable pageable);
+    Page<Candidature> findByOffreRecruteurId(long recruteurId, Pageable pageable);
     Page<Candidature> findByOffreId(long offreId, Pageable pageable);
+    boolean existsByCandidatIdAndOffreId(long candidatId, long offreId);
 }
