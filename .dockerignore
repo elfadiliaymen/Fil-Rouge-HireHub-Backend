@@ -1,0 +1,12 @@
+target/
+.idea/
+.git/
+.gitattributes
+.gitignore
+Dockerfile
+docker-compose.yml
+HELP.md
+mvnw.cmd
+*.iml
+*.iws
+*.ipr

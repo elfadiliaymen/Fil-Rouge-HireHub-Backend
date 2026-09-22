@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mysql:8
+    container_name: hirehub-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: HireHub
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-1234}
+    ports:
+      - "3309:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-1234}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build: .
+    container_name: hirehub-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/HireHub?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-1234}
+      JWT_SECRET: ${JWT_SECRET:-MaSuperCleSecreteTresTresLonguePourEtreSecurisee12345678901234567890}
+      JWT_EXPIRATION: 3600000
+    ports:
+      - "8090:8090"
+
+volumes:
+  db-data:
