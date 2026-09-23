@@ -27,7 +27,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public Page<UserResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<UserResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return userService.findAll(pageable);
     }
 
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @GetMapping("/role/{role}")
-    public Page<UserResponse> findByRole(@PathVariable Role role, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<UserResponse> findByRole(@PathVariable Role role, @PageableDefault(sort = "id") Pageable pageable) {
         return userService.listerParRole(role, pageable);
     }
 

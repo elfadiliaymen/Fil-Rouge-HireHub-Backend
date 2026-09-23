@@ -32,7 +32,7 @@ public class CvController {
     }
 
     @GetMapping
-    public Page<CvResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<CvResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         if (currentUserService.isCandidat()) {
             return cvService.listerCVParCandidat(currentUserService.get().getId(), pageable);
         }
@@ -52,7 +52,7 @@ public class CvController {
 
     @GetMapping("/candidat/{candidatId}")
     public Page<CvResponse> findByCandidat(@PathVariable long candidatId,
-                                           @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                           @PageableDefault(sort = "id") Pageable pageable) {
         if (currentUserService.isCandidat()) {
             candidatId = currentUserService.get().getId();
         }

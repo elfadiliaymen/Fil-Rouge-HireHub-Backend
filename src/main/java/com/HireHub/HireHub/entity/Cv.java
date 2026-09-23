@@ -20,10 +20,10 @@ public class Cv {
     @JoinColumn(name = "candidat_id", nullable = false)
     private User candidat;
 
-    @Column(name = "nom_fichier", nullable = false, length = 255)
+    @Column(name = "nom_fichier", nullable = false)
     private String nomFichier;
 
-    @Column(name = "chemin_fichier", nullable = false, length = 255)
+    @Column(name = "chemin_fichier", nullable = false)
     private String cheminFichier;
 
     @Lob

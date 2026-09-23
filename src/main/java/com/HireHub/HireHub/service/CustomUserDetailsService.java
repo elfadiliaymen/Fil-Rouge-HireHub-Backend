@@ -3,6 +3,7 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.repository.UserRepository;
 import com.HireHub.HireHub.entity.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,8 +20,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    @NonNull
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException("Utilisateur introuvable avec l'email : " + email);

@@ -4,7 +4,6 @@ import com.HireHub.HireHub.config.JwtUtils;
 import com.HireHub.HireHub.config.TokenBlacklist;
 import com.HireHub.HireHub.dto.LoginRequest;
 import com.HireHub.HireHub.dto.RegisterRequest;
-import com.HireHub.HireHub.repository.UserRepository;
 import com.HireHub.HireHub.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +15,12 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private final UserRepository userRepository;
-
     private final JwtUtils jwtUtils;
 
     private final TokenBlacklist tokenBlacklist;
 
-    public AuthController(AuthService authService, UserRepository userRepository, JwtUtils jwtUtils, TokenBlacklist tokenBlacklist) {
+    public AuthController(AuthService authService, JwtUtils jwtUtils, TokenBlacklist tokenBlacklist) {
         this.authService = authService;
-        this.userRepository = userRepository;
         this.jwtUtils = jwtUtils;
         this.tokenBlacklist = tokenBlacklist;
     }

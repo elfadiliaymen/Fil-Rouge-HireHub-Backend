@@ -24,7 +24,7 @@ public class OffreEmploiController {
     }
 
     @GetMapping
-    public Page<OffreResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<OffreResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return offreEmploiService.listerToutesLesOffres(pageable);
     }
 
@@ -35,26 +35,26 @@ public class OffreEmploiController {
 
     @GetMapping("/type/{typeContrat}")
     public Page<OffreResponse> findByTypeContrat(@PathVariable TypeContrat typeContrat,
-                                                 @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                 @PageableDefault(sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParTypeContrat(typeContrat, pageable);
     }
 
     @GetMapping("/localisation/{localisation}")
     public Page<OffreResponse> findByLocalisation(@PathVariable String localisation,
-                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                  @PageableDefault(sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParLocalisation(localisation, pageable);
     }
 
     @GetMapping("/recruteur/{recruteurId}")
     public Page<OffreResponse> findByRecruteur(@PathVariable long recruteurId,
-                                               @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                               @PageableDefault(sort = "id") Pageable pageable) {
         return offreEmploiService.listerOffresParRecruteur(recruteurId, pageable);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/{id}/candidatures")
     public Page<CandidatureResponse> candidaturesParOffre(@PathVariable long id,
-                                                          @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                          @PageableDefault(sort = "id") Pageable pageable) {
         return offreEmploiService.listerCandidaturesParOffre(id, pageable);
     }
 

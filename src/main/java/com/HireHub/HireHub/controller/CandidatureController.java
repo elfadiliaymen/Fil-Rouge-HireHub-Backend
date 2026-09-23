@@ -27,7 +27,7 @@ public class CandidatureController {
     }
 
     @GetMapping
-    public Page<CandidatureResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<CandidatureResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         if (currentUserService.isCandidat()) {
             return candidatureService.listerCandidaturesParCandidat(currentUserService.get().getId(), pageable);
         }
@@ -52,7 +52,7 @@ public class CandidatureController {
 
     @GetMapping("/candidat/{candidatId}")
     public Page<CandidatureResponse> findByCandidat(@PathVariable long candidatId,
-                                                    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                    @PageableDefault(sort = "id") Pageable pageable) {
         if (currentUserService.isCandidat()) {
             candidatId = currentUserService.get().getId();
         }
@@ -62,14 +62,14 @@ public class CandidatureController {
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/offre/{offreId}")
     public Page<CandidatureResponse> findByOffre(@PathVariable long offreId,
-                                                 @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                 @PageableDefault(sort = "id") Pageable pageable) {
         return candidatureService.listerCandidaturesParOffre(offreId, pageable);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/statut/{statut}")
     public Page<CandidatureResponse> findByStatut(@PathVariable StatutCandidature statut,
-                                                  @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                  @PageableDefault(sort = "id") Pageable pageable) {
         return candidatureService.listerCandidaturesParStatut(statut, pageable);
     }
 

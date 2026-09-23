@@ -25,7 +25,7 @@ public class EntretienController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping
-    public Page<EntretienResponse> findAll(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public Page<EntretienResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return entretienService.listerTousLesEntretiens(pageable);
     }
 
@@ -38,21 +38,21 @@ public class EntretienController {
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/date/{date}")
     public Page<EntretienResponse> findByDate(@PathVariable LocalDate date,
-                                              @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                              @PageableDefault(sort = "id") Pageable pageable) {
         return entretienService.listerEntretiensParDate(date, pageable);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/recruteur/{recruteurId}")
     public Page<EntretienResponse> findByRecruteur(@PathVariable long recruteurId,
-                                                   @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                   @PageableDefault(sort = "id") Pageable pageable) {
         return entretienService.listerEntretiensParRecruteur(recruteurId, pageable);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @GetMapping("/candidature/{candidatureId}")
     public Page<EntretienResponse> findByCandidature(@PathVariable long candidatureId,
-                                                     @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+                                                     @PageableDefault(sort = "id") Pageable pageable) {
         return entretienService.listerEntretiensParCandidature(candidatureId, pageable);
     }
 

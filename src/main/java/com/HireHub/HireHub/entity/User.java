@@ -39,7 +39,7 @@ public class User {
     @Column(length = 20)
     private String telephone;
 
-    @Column(length = 255)
+    @Column
     private String adresse;
 
     @Column(length = 100)
@@ -60,7 +60,7 @@ public class User {
     @Column
     private Integer experienceAnnees;
 
-    @Column(length = 255)
+    @Column
     private String linkedinUrl;
 
 
