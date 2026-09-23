@@ -103,21 +103,6 @@ Copier le fichier `.env.example` vers `.env` :
 cp .env.example .env
 ```
 
-Compléter ensuite les valeurs dans le fichier `.env` :
-
-```env
-SERVER_PORT=8090
-DB_URL=jdbc:mysql://localhost:3306/HireHub?createDatabaseIfNotExist=true
-DB_USERNAME=root
-DB_PASSWORD=UN_MOT_DE_PASSE
-JWT_SECRET=UNE_CLE_TRES_LONGUE_AU_MOINS_64_CARACTERES
-JWT_EXPIRATION=3600000
-CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:8080
-```
-
-> ⚠️ Ne jamais publier ce fichier `.env` : il contient des informations sensibles.
-
----
 
 ## 6.6 Lancer le projet
 
