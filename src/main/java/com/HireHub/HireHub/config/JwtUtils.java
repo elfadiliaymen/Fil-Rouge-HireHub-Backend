@@ -15,6 +15,9 @@ public class JwtUtils {
 
     private final Key key;
 
+    @Value("${jwt.expiration:3600000}")
+    private long expirationMs;
+
     public JwtUtils(@Value("${jwt.secret:}") String secret) {
         if (secret == null || secret.isBlank()) {
             throw new IllegalStateException("jwt.secret doit être configurée dans application.properties");
@@ -28,7 +31,7 @@ public class JwtUtils {
                 .setSubject(email)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
