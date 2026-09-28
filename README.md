@@ -6,11 +6,7 @@
 
 # 2. Présentation du projet
 
-Ce projet est une **API REST** qui gère toute la logique métier d'une plateforme de recrutement. Elle s'adresse principalement aux **entreprises (recruteurs)** qui souhaitent diffuser des offres d'emploi et suivre les candidatures, ainsi qu'aux **candidats** qui recherchent un emploi, déposent leur CV et participent à des entretiens.
-
-Son objectif principal est de fournir une base de données sécurisée et un point d'entrée unique pour toutes les fonctionnalités de l'application (gestion des utilisateurs, des offres, des CV, des candidatures et des entretiens).
-
-L'API est documentée automatiquement avec **Swagger UI** et expose ses données via des routes REST commençant par `/api`.
+HireHub Backend est une API REST professionnelle, sécurisée et maintenable, conçue pour orchestrer l'ensemble du processus de recrutement. Elle centralise la gestion des utilisateurs, des offres, des CV, des candidatures et des entretiens, et expose des endpoints conformes à OpenAPI (Swagger). Le service est pensé pour le déploiement en conteneur, l'intégration continue et l'analyse automatisée de la qualité du code.
 
 ---
 
@@ -38,14 +34,15 @@ La solution proposée permet de **centraliser l'ensemble du processus au même e
 
 | Technologie | Utilisation dans le projet |
 |-------------|----------------------------|
-| Java 21 | Langage de programmation principal du backend |
-| Spring Boot 4 | Framework qui permet de développer l'API REST |
-| Spring Security + JWT | Authentification des utilisateurs et contrôle des accès selon les rôles |
-| MySQL | Base de données relationnelle qui stocke toutes les données |
-| Flyway | Outil de gestion des migrations de la base de données |
-| Springdoc OpenAPI | Génération automatique de la documentation de l'API (Swagger UI) |
-| Docker / Docker Compose | Conteneurisation de la base de données et du backend |
-| GitHub Actions | Intégration continue (tests et déploiement automatiques) |
+| Java 21 | Langage principal utilisé pour le backend |
+| Spring Boot 4 | Framework de développement et organisation des composants REST |
+| Spring Security + JWT | Authentification, autorisation et gestion des accès par rôle |
+| MySQL | Stockage relationnel des données de production et de test |
+| Flyway | Versioning et exécution des migrations de schéma de base de données |
+| Springdoc OpenAPI (Swagger) | Documentation interactive et description des endpoints API |
+| Docker / Docker Compose | Conteneurisation pour développement et déploiement |
+| GitHub Actions | Pipelines CI/CD (build, tests, déploiement) |
+| SonarQube | Analyse continue de la qualité du code et détection des dettes techniques |
 
 ---
 
