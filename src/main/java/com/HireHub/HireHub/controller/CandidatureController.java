@@ -2,9 +2,11 @@ package com.HireHub.HireHub.controller;
 
 import com.HireHub.HireHub.dto.CandidatureRequest;
 import com.HireHub.HireHub.dto.CandidatureResponse;
+import com.HireHub.HireHub.dto.CandidatureStatsResponse;
 import com.HireHub.HireHub.entity.enums.StatutCandidature;
 import com.HireHub.HireHub.service.CandidatureService;
 import com.HireHub.HireHub.service.CurrentUserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -35,6 +37,15 @@ public class CandidatureController {
             return candidatureService.listerCandidaturesParRecruteur(currentUserService.get().getId(), pageable);
         }
         return candidatureService.listerToutesLesCandidatures(pageable);
+    }
+
+    @GetMapping("/stats")
+    public CandidatureStatsResponse stats() {
+        if (!currentUserService.isCandidat()) {
+            throw new com.HireHub.HireHub.exception.ResourceNotFoundException(
+                    "Candidature introuvable avec l'id 0");
+        }
+        return candidatureService.compterCandidaturesDuCandidatConnecte();
     }
 
     @GetMapping("/{id}")
@@ -75,7 +86,7 @@ public class CandidatureController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @PostMapping
-    public ResponseEntity<CandidatureResponse> save(@RequestBody CandidatureRequest request) {
+    public ResponseEntity<CandidatureResponse> save(@Valid @RequestBody CandidatureRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(candidatureService.soumettreCandidature(request));
     }
 

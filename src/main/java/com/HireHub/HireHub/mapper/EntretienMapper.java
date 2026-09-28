@@ -5,6 +5,7 @@ import com.HireHub.HireHub.dto.EntretienResponse;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.Entretien;
 import com.HireHub.HireHub.entity.User;
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 
 public final class EntretienMapper {
 
@@ -20,6 +21,7 @@ public final class EntretienMapper {
         response.setDate(entretien.getDate());
         response.setHeure(entretien.getHeure());
         response.setLieu(entretien.getLieu());
+        response.setStatut(entretien.getStatut());
         response.setCandidatureId(entretien.getCandidature().getId());
         response.setRecruteur(UserMapper.toUserResponse(entretien.getRecruteur()));
         return response;
@@ -30,6 +32,7 @@ public final class EntretienMapper {
         entretien.setDate(request.getDate());
         entretien.setHeure(request.getHeure());
         entretien.setLieu(request.getLieu());
+        entretien.setStatut(StatutEntretien.PLANIFIE);
         entretien.setCandidature(candidature);
         entretien.setRecruteur(recruteur);
         return entretien;

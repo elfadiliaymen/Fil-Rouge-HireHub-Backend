@@ -5,6 +5,7 @@ import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,10 +46,12 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/nom/{nom}")
-    public UserResponse findByNom(@PathVariable String nom) {
-        return userService.getUserByNom(nom);
+    public Page<UserResponse> findByNom(@PathVariable String nom,
+                                        @PageableDefault(sort = "id") Pageable pageable) {
+        return userService.listerParNom(nom, pageable);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/role/{role}")
     public Page<UserResponse> findByRole(@PathVariable Role role, @PageableDefault(sort = "id") Pageable pageable) {
         return userService.listerParRole(role, pageable);
@@ -62,19 +65,19 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.inscrire(request));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<UserResponse> save(@RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> save(@Valid @RequestBody UserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.creerUtilisateur(request));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public UserResponse update(@PathVariable long id, @RequestBody UserRequest request) {
+    public UserResponse update(@PathVariable long id, @Valid @RequestBody UserRequest request) {
         return userService.updateUtilisateur(id, request);
     }
 

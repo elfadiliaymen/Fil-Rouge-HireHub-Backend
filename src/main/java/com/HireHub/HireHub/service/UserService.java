@@ -6,24 +6,49 @@ import com.HireHub.HireHub.dto.RegisterRequest;
 import com.HireHub.HireHub.dto.UpdateProfileRequest;
 import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;
+import com.HireHub.HireHub.entity.Candidature;
+import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.exception.ResourceNotFoundException;
+import com.HireHub.HireHub.repository.CandidatureRepository;
+import com.HireHub.HireHub.repository.CvRepository;
+import com.HireHub.HireHub.repository.EntretienRepository;
+import com.HireHub.HireHub.repository.OffreEmploiRepository;
 import com.HireHub.HireHub.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EntretienRepository entretienRepository;
+    private final CandidatureRepository candidatureRepository;
+    private final OffreEmploiRepository offreEmploiRepository;
+    private final CvRepository cvRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       EntretienRepository entretienRepository,
+                       CandidatureRepository candidatureRepository,
+                       OffreEmploiRepository offreEmploiRepository,
+                       CvRepository cvRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.entretienRepository = entretienRepository;
+        this.candidatureRepository = candidatureRepository;
+        this.offreEmploiRepository = offreEmploiRepository;
+        this.cvRepository = cvRepository;
     }
 
     public Page<UserResponse> findAll(Pageable pageable) {
@@ -38,12 +63,8 @@ public class UserService {
         return UserMapper.toUserResponse(user);
     }
 
-    public UserResponse getUserByNom(String nom) {
-        User user = userRepository.findByNom(nom);
-        if (user == null) {
-            throw new ResourceNotFoundException("Utilisateur introuvable avec le nom " + nom);
-        }
-        return UserMapper.toUserResponse(user);
+    public Page<UserResponse> listerParNom(String nom, Pageable pageable) {
+        return userRepository.findByNom(nom, pageable).map(UserMapper::toUserResponse);
     }
 
     public UserResponse getUserById(long id) {
@@ -51,13 +72,14 @@ public class UserService {
     }
 
     public UserResponse creerUtilisateur(UserRequest request) {
+        verifierChampsObligatoires(request);
+        verifierEmailUnique(request.getEmail());
         User user = UserMapper.toUser(request);
         return UserMapper.toUserResponse(userRepository.save(user));
     }
 
     public UserResponse inscrire(RegisterRequest request) {
-        User user = UserMapper.toUser(request);
-        return UserMapper.toUserResponse(userRepository.save(user));
+        return creerUtilisateur(UserMapper.toUserRequest(request));
     }
 
     public UserResponse updateUtilisateur(long id, UserRequest request) {
@@ -72,7 +94,7 @@ public class UserService {
             existant.setEmail(request.getEmail());
         }
         if (request.getPassword() != null) {
-            existant.setPassword(request.getPassword());
+            existant.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         if (request.getRole() != null) {
             existant.setRole(request.getRole());
@@ -98,7 +120,10 @@ public class UserService {
         if (request.getNiveauEtude() != null) {
             existant.setNiveauEtude(request.getNiveauEtude());
         }
-        existant.setExperienceAnnees(request.getExperienceAnnees());
+        if (request.getExperienceAnnees() != null) {
+            validerExperienceAnnees(request.getExperienceAnnees());
+            existant.setExperienceAnnees(request.getExperienceAnnees());
+        }
         if (request.getLinkedinUrl() != null) {
             existant.setLinkedinUrl(request.getLinkedinUrl());
         }
@@ -118,6 +143,26 @@ public class UserService {
     }
 
     public String deleteUtilisateur(long id) {
+        entretienRepository.deleteByRecruteurId(id);
+
+        List<Candidature> candidaturesCandidat = candidatureRepository.findByCandidatId(id);
+        for (Candidature candidature : candidaturesCandidat) {
+            entretienRepository.deleteByCandidatureId(candidature.getId());
+        }
+        candidatureRepository.deleteAll(candidaturesCandidat);
+
+        List<OffreEmploi> offres = offreEmploiRepository.findByRecruteurId(id);
+        for (OffreEmploi offre : offres) {
+            List<Candidature> candidaturesOffre = candidatureRepository.findByOffreId(offre.getId());
+            for (Candidature candidature : candidaturesOffre) {
+                entretienRepository.deleteByCandidatureId(candidature.getId());
+                candidatureRepository.delete(candidature);
+            }
+        }
+        offreEmploiRepository.deleteAll(offres);
+
+        cvRepository.deleteByCandidatId(id);
+
         userRepository.deleteById(id);
         return "Utilisateur supprimé avec succès";
     }
@@ -129,8 +174,8 @@ public class UserService {
     public Map<String, Long> statistiques() {
         Map<String, Long> stats = new LinkedHashMap<>();
         stats.put("total", userRepository.count());
-        stats.put("actifs", userRepository.findAll().stream().filter(User::isActive).count());
-        stats.put("inactifs", userRepository.findAll().stream().filter(user -> !user.isActive()).count());
+        stats.put("actifs", userRepository.countByActiveTrue());
+        stats.put("inactifs", userRepository.countByActiveFalse());
         stats.put("administrateurs", userRepository.countByRole(Role.ADMIN));
         stats.put("recruteurs", userRepository.countByRole(Role.RECRUTEUR));
         stats.put("candidats", userRepository.countByRole(Role.CANDIDAT));
@@ -177,7 +222,10 @@ public class UserService {
         if (request.getNiveauEtude() != null) {
             user.setNiveauEtude(request.getNiveauEtude());
         }
-        user.setExperienceAnnees(request.getExperienceAnnees());
+        if (request.getExperienceAnnees() != null) {
+            validerExperienceAnnees(request.getExperienceAnnees());
+            user.setExperienceAnnees(request.getExperienceAnnees());
+        }
         if (request.getLinkedinUrl() != null) {
             user.setLinkedinUrl(request.getLinkedinUrl());
         }
@@ -189,13 +237,13 @@ public class UserService {
         if (user == null) {
             throw new ResourceNotFoundException("Utilisateur introuvable avec l'email " + email);
         }
-        if (request.getOldPassword() == null || !user.getPassword().equals(request.getOldPassword())) {
+        if (request.getOldPassword() == null || !passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("L'ancien mot de passe est incorrect");
         }
         if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
             throw new IllegalArgumentException("Le nouveau mot de passe est obligatoire");
         }
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         return "Mot de passe modifié avec succès";
     }
@@ -203,5 +251,35 @@ public class UserService {
     private User requerirUtilisateur(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable avec l'id " + id));
+    }
+
+    private void verifierChampsObligatoires(UserRequest request) {
+        if (request.getNom() == null || request.getNom().isBlank()) {
+            throw new IllegalArgumentException("Le nom est obligatoire");
+        }
+        if (request.getPrenom() == null || request.getPrenom().isBlank()) {
+            throw new IllegalArgumentException("Le prénom est obligatoire");
+        }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Le mot de passe est obligatoire");
+        }
+        if (request.getRole() == null) {
+            throw new IllegalArgumentException("Le rôle est obligatoire");
+        }
+    }
+
+    private void verifierEmailUnique(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("L'email est obligatoire");
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("L'email existe déjà");
+        }
+    }
+
+    private void validerExperienceAnnees(Integer experienceAnnees) {
+        if (experienceAnnees < 0) {
+            throw new IllegalArgumentException("Le nombre d'années d'expérience ne peut pas être négatif");
+        }
     }
 }

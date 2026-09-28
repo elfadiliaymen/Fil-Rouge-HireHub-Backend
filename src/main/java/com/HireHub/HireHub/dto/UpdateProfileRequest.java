@@ -1,5 +1,7 @@
 package com.HireHub.HireHub.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,18 +11,35 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class UpdateProfileRequest {
 
+    @Size(max = 20, message = "Le nom ne doit pas dépasser 20 caractères")
     private String nom;
+
+    @Size(max = 20, message = "Le prénom ne doit pas dépasser 20 caractères")
     private String prenom;
 
+    @Size(max = 20, message = "Le numéro ne doit pas dépasser 20 caractères")
     private String telephone;
+
+    @Size(max = 255, message = "L'adresse ne doit pas dépasser 255 caractères")
     private String adresse;
 
+    @Size(max = 100, message = "L'entreprise ne doit pas dépasser 100 caractères")
     private String entreprise;
+
+    @Size(max = 50, message = "Le poste ne doit pas dépasser 50 caractères")
     private String poste;
+
+    @Size(max = 20, message = "Le numéro ne doit pas dépasser 20 caractères")
     private String telephonePro;
 
     private LocalDate dateNaissance;
+
+    @Size(max = 50, message = "Le niveau d'étude ne doit pas dépasser 50 caractères")
     private String niveauEtude;
+
+    @Min(value = 0, message = "Le nombre d'années d'expérience ne peut pas être négatif")
     private Integer experienceAnnees;
+
+    @Size(max = 255, message = "Le lien LinkedIn ne doit pas dépasser 255 caractères")
     private String linkedinUrl;
 }

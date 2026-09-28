@@ -1,5 +1,6 @@
 package com.HireHub.HireHub.dto;
 
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class EntretienResponse {
     private LocalDate date;
     private LocalTime heure;
     private String lieu;
+    private StatutEntretien statut;
     private long candidatureId;
     private UserResponse recruteur;
 }

@@ -63,6 +63,5 @@ public class User {
     @Column
     private String linkedinUrl;
 
-
 }
 

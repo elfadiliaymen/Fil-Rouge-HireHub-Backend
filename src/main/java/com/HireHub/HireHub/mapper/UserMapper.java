@@ -5,10 +5,14 @@ import com.HireHub.HireHub.dto.UserRequest;
 import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
 public final class UserMapper {
+
+    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     private UserMapper() {
     }
@@ -41,7 +45,7 @@ public final class UserMapper {
         user.setNom(request.getNom());
         user.setPrenom(request.getPrenom());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(PASSWORD_ENCODER.encode(request.getPassword()));
         user.setRole(request.getRole() != null ? request.getRole() : Role.CANDIDAT);
         user.setActive(true);
         appliquerChampsProfil(user, request.getTelephone(), request.getAdresse(),
@@ -56,7 +60,7 @@ public final class UserMapper {
         user.setNom(request.getNom());
         user.setPrenom(request.getPrenom());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(PASSWORD_ENCODER.encode(request.getPassword()));
         user.setRole(request.getRole() != null ? request.getRole() : Role.CANDIDAT);
         user.setActive(true);
         appliquerChampsProfil(user, request.getTelephone(), request.getAdresse(),
@@ -64,6 +68,25 @@ public final class UserMapper {
                 request.getDateNaissance(), request.getNiveauEtude(), request.getExperienceAnnees(),
                 request.getLinkedinUrl());
         return user;
+    }
+
+    public static UserRequest toUserRequest(RegisterRequest request) {
+        UserRequest userRequest = new UserRequest();
+        userRequest.setNom(request.getNom());
+        userRequest.setPrenom(request.getPrenom());
+        userRequest.setEmail(request.getEmail());
+        userRequest.setPassword(request.getPassword());
+        userRequest.setRole(request.getRole());
+        userRequest.setTelephone(request.getTelephone());
+        userRequest.setAdresse(request.getAdresse());
+        userRequest.setEntreprise(request.getEntreprise());
+        userRequest.setPoste(request.getPoste());
+        userRequest.setTelephonePro(request.getTelephonePro());
+        userRequest.setDateNaissance(request.getDateNaissance());
+        userRequest.setNiveauEtude(request.getNiveauEtude());
+        userRequest.setExperienceAnnees(request.getExperienceAnnees());
+        userRequest.setLinkedinUrl(request.getLinkedinUrl());
+        return userRequest;
     }
 
     private static void appliquerChampsProfil(User user, String telephone, String adresse,

@@ -5,8 +5,10 @@ import com.HireHub.HireHub.dto.OffreRequest;
 import com.HireHub.HireHub.dto.OffreResponse;
 import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.service.OffreEmploiService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +26,10 @@ public class OffreEmploiController {
     }
 
     @GetMapping
-    public Page<OffreResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
-        return offreEmploiService.listerToutesLesOffres(pageable);
+    public Page<OffreResponse> findAll(@RequestParam(required = false) String q,
+                                       @RequestParam(required = false) TypeContrat type,
+                                       @PageableDefault(sort = "datePublication", direction = Sort.Direction.DESC) Pageable pageable) {
+        return offreEmploiService.rechercherOffres(q, type, pageable);
     }
 
     @GetMapping("/{id}")
@@ -35,13 +39,13 @@ public class OffreEmploiController {
 
     @GetMapping("/type/{typeContrat}")
     public Page<OffreResponse> findByTypeContrat(@PathVariable TypeContrat typeContrat,
-                                                 @PageableDefault(sort = "id") Pageable pageable) {
+                                                 @PageableDefault(sort = "datePublication", direction = Sort.Direction.DESC) Pageable pageable) {
         return offreEmploiService.listerOffresParTypeContrat(typeContrat, pageable);
     }
 
     @GetMapping("/localisation/{localisation}")
     public Page<OffreResponse> findByLocalisation(@PathVariable String localisation,
-                                                  @PageableDefault(sort = "id") Pageable pageable) {
+                                                  @PageableDefault(sort = "datePublication", direction = Sort.Direction.DESC) Pageable pageable) {
         return offreEmploiService.listerOffresParLocalisation(localisation, pageable);
     }
 
@@ -60,13 +64,13 @@ public class OffreEmploiController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PostMapping
-    public ResponseEntity<OffreResponse> save(@RequestBody OffreRequest request) {
+    public ResponseEntity<OffreResponse> save(@Valid @RequestBody OffreRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(offreEmploiService.creerOffre(request));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PutMapping("/{id}")
-    public OffreResponse update(@PathVariable long id, @RequestBody OffreRequest request) {
+    public OffreResponse update(@PathVariable long id, @Valid @RequestBody OffreRequest request) {
         return offreEmploiService.updateOffre(id, request);
     }
 

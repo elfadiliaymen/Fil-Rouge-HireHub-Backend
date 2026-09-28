@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "candidatures")
+@Table(name = "candidatures",
+        uniqueConstraints = @UniqueConstraint(name = "uq_candidature_candidat_offre",
+                columnNames = {"candidat_id", "offre_id"}))
 @Data
 @NoArgsConstructor
 public class Candidature {
@@ -32,12 +35,17 @@ public class Candidature {
     private User candidat;
 
     @JsonIgnore
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "candidature")
     private List<Entretien> entretiens = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "offre_id", nullable = false)
     private OffreEmploi offre;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cv_id")
+    private Cv cv;
 
     @PrePersist
     protected void onCreate() {

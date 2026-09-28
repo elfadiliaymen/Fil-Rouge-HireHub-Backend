@@ -2,7 +2,9 @@ package com.HireHub.HireHub.controller;
 
 import com.HireHub.HireHub.dto.EntretienRequest;
 import com.HireHub.HireHub.dto.EntretienResponse;
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 import com.HireHub.HireHub.service.EntretienService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -23,19 +25,19 @@ public class EntretienController {
         this.entretienService = entretienService;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR', 'CANDIDAT')")
     @GetMapping
     public Page<EntretienResponse> findAll(@PageableDefault(sort = "id") Pageable pageable) {
         return entretienService.listerTousLesEntretiens(pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR', 'CANDIDAT')")
     @GetMapping("/{id}")
     public EntretienResponse findById(@PathVariable long id) {
         return entretienService.consulterEntretienParId(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR', 'CANDIDAT')")
     @GetMapping("/date/{date}")
     public Page<EntretienResponse> findByDate(@PathVariable LocalDate date,
                                               @PageableDefault(sort = "id") Pageable pageable) {
@@ -49,7 +51,7 @@ public class EntretienController {
         return entretienService.listerEntretiensParRecruteur(recruteurId, pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR', 'CANDIDAT')")
     @GetMapping("/candidature/{candidatureId}")
     public Page<EntretienResponse> findByCandidature(@PathVariable long candidatureId,
                                                      @PageableDefault(sort = "id") Pageable pageable) {
@@ -58,14 +60,21 @@ public class EntretienController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PostMapping
-    public ResponseEntity<EntretienResponse> save(@RequestBody EntretienRequest request) {
+    public ResponseEntity<EntretienResponse> save(@Valid @RequestBody EntretienRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(entretienService.planifierEntretien(request));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
     @PutMapping("/{id}")
-    public EntretienResponse update(@PathVariable long id, @RequestBody EntretienRequest request) {
+    public EntretienResponse update(@PathVariable long id, @Valid @RequestBody EntretienRequest request) {
         return entretienService.updateEntretien(id, request);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")
+    @PatchMapping("/{id}/resultat/{statut}")
+    public EntretienResponse enregistrerResultat(@PathVariable long id,
+                                                @PathVariable StatutEntretien statut) {
+        return entretienService.enregistrerResultat(id, statut);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECRUTEUR')")

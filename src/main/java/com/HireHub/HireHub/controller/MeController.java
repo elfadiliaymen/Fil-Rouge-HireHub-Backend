@@ -4,6 +4,7 @@ import com.HireHub.HireHub.dto.ChangePasswordRequest;
 import com.HireHub.HireHub.dto.UpdateProfileRequest;
 import com.HireHub.HireHub.dto.UserResponse;
 import com.HireHub.HireHub.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,12 @@ public class MeController {
     }
 
     @PutMapping
-    public UserResponse update(@RequestBody UpdateProfileRequest request) {
+    public UserResponse update(@Valid @RequestBody UpdateProfileRequest request) {
         return userService.updateMe(currentEmail(), request);
     }
 
     @PostMapping("/password")
-    public String changePassword(@RequestBody ChangePasswordRequest request) {
+    public String changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         return userService.changePassword(currentEmail(), request);
     }
 

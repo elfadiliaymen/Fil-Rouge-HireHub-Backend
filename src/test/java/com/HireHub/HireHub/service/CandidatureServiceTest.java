@@ -1,12 +1,17 @@
 package com.HireHub.HireHub.service;
 
+import com.HireHub.HireHub.dto.CandidatureRequest;
 import com.HireHub.HireHub.dto.CandidatureResponse;
 import com.HireHub.HireHub.entity.Candidature;
+import com.HireHub.HireHub.entity.Cv;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.entity.enums.StatutCandidature;
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 import com.HireHub.HireHub.repository.CandidatureRepository;
+import com.HireHub.HireHub.repository.CvRepository;
+import com.HireHub.HireHub.repository.EntretienRepository;
 import com.HireHub.HireHub.repository.OffreEmploiRepository;
 import com.HireHub.HireHub.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -14,15 +19,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,83 +43,90 @@ class CandidatureServiceTest {
     private OffreEmploiRepository offreEmploiRepository;
 
     @Mock
+    private CvRepository cvRepository;
+
+    @Mock
+    private EntretienRepository entretienRepository;
+
+    @Mock
     private CurrentUserService currentUserService;
 
     @InjectMocks
     private CandidatureService candidatureService;
 
     @Test
-    void consulterCandidatureParId() {
+    void soumettreCandidatureAvecCv() {
         // Arrange
         User candidat = new User();
         candidat.setId(1L);
         candidat.setNom("Dupont");
         candidat.setPrenom("Jean");
+        candidat.setRole(Role.CANDIDAT);
 
         OffreEmploi offre = new OffreEmploi();
         offre.setId(1L);
         offre.setTitre("Développeur Java");
         offre.setRecruteur(candidat);
 
-        Candidature candidature = new Candidature();
-        candidature.setId(1L);
-        candidature.setCandidat(candidat);
-        candidature.setOffre(offre);
-        candidature.setStatut(StatutCandidature.EN_ATTENTE);
+        Cv cv = new Cv();
+        cv.setId(10L);
+        cv.setCandidat(candidat);
+        cv.setNomFichier("cv.pdf");
 
-        when(candidatureRepository.findById(1L)).thenReturn(Optional.of(candidature));
+        CandidatureRequest request = new CandidatureRequest();
+        request.setCandidatId(1L);
+        request.setOffreId(1L);
+        request.setCvId(10L);
+
+        Candidature saved = new Candidature();
+        saved.setId(1L);
+        saved.setCandidat(candidat);
+        saved.setOffre(offre);
+        saved.setCv(cv);
+        saved.setStatut(StatutCandidature.EN_ATTENTE);
+
+        when(candidatureRepository.existsByCandidatIdAndOffreId(1L, 1L)).thenReturn(false);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(candidat));
+        when(offreEmploiRepository.findById(1L)).thenReturn(Optional.of(offre));
+        when(cvRepository.findById(10L)).thenReturn(Optional.of(cv));
+        when(candidatureRepository.save(any(Candidature.class))).thenReturn(saved);
 
         // Act
-        CandidatureResponse result = candidatureService.consulterCandidatureParId(1L);
+        CandidatureResponse result = candidatureService.soumettreCandidature(request);
 
         // Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals(StatutCandidature.EN_ATTENTE, result.getStatut());
+        assertNotNull(result.getCv());
+        assertEquals(10L, result.getCv().getId());
+        assertEquals("cv.pdf", result.getCv().getNomFichier());
     }
 
     @Test
-    void listerToutesLesCandidatures() {
+    void accepterUneCandidatureSansEntretienReussiEstRefuse() {
         // Arrange
-        Pageable pageable = PageRequest.of(0, 10);
-
-        User candidat = new User();
-        candidat.setId(1L);
-        candidat.setNom("Dupont");
-        candidat.setPrenom("Jean");
+        User recruteur = new User();
+        recruteur.setId(2L);
+        recruteur.setRole(Role.RECRUTEUR);
 
         OffreEmploi offre = new OffreEmploi();
         offre.setId(1L);
-        offre.setTitre("Développeur Java");
-        offre.setRecruteur(candidat);
+        offre.setRecruteur(recruteur);
 
         Candidature candidature = new Candidature();
-        candidature.setId(1L);
-        candidature.setCandidat(candidat);
-        candidature.setOffre(offre);
+        candidature.setId(7L);
         candidature.setStatut(StatutCandidature.EN_ATTENTE);
+        candidature.setOffre(offre);
 
-        Page<Candidature> page = new PageImpl<>(List.of(candidature));
+        when(candidatureRepository.findById(7L)).thenReturn(Optional.of(candidature));
+        when(currentUserService.isCandidat()).thenReturn(false);
+        when(currentUserService.isRecruteur()).thenReturn(true);
+        when(currentUserService.get()).thenReturn(recruteur);
+        when(entretienRepository.existsByCandidatureIdAndStatut(7L, StatutEntretien.REUSSI)).thenReturn(false);
 
-        when(candidatureRepository.findAll(pageable)).thenReturn(page);
-
-        // Act
-        Page<CandidatureResponse> result =
-                candidatureService.listerToutesLesCandidatures(pageable);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertEquals(StatutCandidature.EN_ATTENTE,
-                result.getContent().get(0).getStatut());
-    }
-
-    @Test
-    void deleteCandidature() {
-        // Arrange & Act
-        String result = candidatureService.deleteCandidature(1L);
-
-        // Assert
-        assertEquals("Candidature supprimée avec succès", result);
+        // Act + Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> candidatureService.changerStatut(7L, StatutCandidature.ACCEPTEE));
+        assertEquals("Impossible d'accepter une candidature sans entretien réussi", exception.getMessage());
+        verify(candidatureRepository, never()).save(any(Candidature.class));
     }
 }

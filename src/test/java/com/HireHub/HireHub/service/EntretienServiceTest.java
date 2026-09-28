@@ -3,10 +3,10 @@ package com.HireHub.HireHub.service;
 import com.HireHub.HireHub.dto.EntretienResponse;
 import com.HireHub.HireHub.entity.Candidature;
 import com.HireHub.HireHub.entity.Entretien;
-import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
 import com.HireHub.HireHub.entity.enums.StatutCandidature;
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 import com.HireHub.HireHub.repository.CandidatureRepository;
 import com.HireHub.HireHub.repository.EntretienRepository;
 import com.HireHub.HireHub.repository.UserRepository;
@@ -25,7 +25,10 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,120 +50,72 @@ class EntretienServiceTest {
     private EntretienService entretienService;
 
     @Test
-    void consulterEntretienParId() {
-        // Arrange
-        User candidat = new User();
-        candidat.setId(1L);
-        candidat.setNom("Dupont");
-        candidat.setPrenom("Jean");
-        candidat.setEmail("jean.dupont@example.com");
-        candidat.setRole(Role.CANDIDAT);
-        candidat.setActive(true);
-
-        OffreEmploi offre = new OffreEmploi();
-        offre.setId(1L);
-        offre.setTitre("Développeur Java");
-        offre.setRecruteur(candidat);
-
-        Candidature candidature = new Candidature();
-        candidature.setId(1L);
-        candidature.setCandidat(candidat);
-        candidature.setOffre(offre);
-        candidature.setStatut(StatutCandidature.ACCEPTEE);
-
-        User recruteur = new User();
-        recruteur.setId(2L);
-        recruteur.setNom("Martin");
-        recruteur.setPrenom("Sophie");
-        recruteur.setEmail("sophie.martin@example.com");
-        recruteur.setRole(Role.RECRUTEUR);
-        recruteur.setActive(true);
-
-        Entretien entretien = new Entretien();
-        entretien.setId(1L);
-        entretien.setDate(LocalDate.of(2026, 9, 15));
-        entretien.setHeure(LocalTime.of(10, 0));
-        entretien.setLieu("Salle B2");
-        entretien.setCandidature(candidature);
-        entretien.setRecruteur(recruteur);
-
-        when(entretienRepository.findById(1L)).thenReturn(Optional.of(entretien));
-
-        // Act
-        EntretienResponse result = entretienService.consulterEntretienParId(1L);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(LocalDate.of(2026, 9, 15), result.getDate());
-        assertEquals("Salle B2", result.getLieu());
-        assertEquals(1L, result.getCandidatureId());
-    }
-
-    @Test
-    void listerTousLesEntretiens() {
+    void listerTousLesEntretiensLimiteLesEntretiensDuCandidatConnecte() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
 
         User candidat = new User();
         candidat.setId(1L);
-        candidat.setNom("Dupont");
-        candidat.setPrenom("Jean");
-        candidat.setEmail("jean.dupont@example.com");
         candidat.setRole(Role.CANDIDAT);
-        candidat.setActive(true);
-
-        OffreEmploi offre = new OffreEmploi();
-        offre.setId(1L);
-        offre.setTitre("Développeur Java");
-        offre.setRecruteur(candidat);
-
-        Candidature candidature = new Candidature();
-        candidature.setId(1L);
-        candidature.setCandidat(candidat);
-        candidature.setOffre(offre);
-        candidature.setStatut(StatutCandidature.ACCEPTEE);
-
-        User recruteur = new User();
-        recruteur.setId(2L);
-        recruteur.setNom("Martin");
-        recruteur.setPrenom("Sophie");
-        recruteur.setEmail("sophie.martin@example.com");
-        recruteur.setRole(Role.RECRUTEUR);
-        recruteur.setActive(true);
 
         Entretien entretien = new Entretien();
         entretien.setId(1L);
         entretien.setDate(LocalDate.of(2026, 9, 15));
         entretien.setHeure(LocalTime.of(10, 0));
         entretien.setLieu("Salle B2");
+
+        Candidature candidature = new Candidature();
+        candidature.setId(1L);
+        candidature.setCandidat(candidat);
         entretien.setCandidature(candidature);
-        entretien.setRecruteur(recruteur);
 
         Page<Entretien> page = new PageImpl<>(List.of(entretien));
 
-        when(entretienRepository.findAll(pageable)).thenReturn(page);
+        when(currentUserService.isCandidat()).thenReturn(true);
+        when(currentUserService.get()).thenReturn(candidat);
+        when(entretienRepository.findByCandidatureCandidatId(1L, pageable)).thenReturn(page);
 
         // Act
-        Page<EntretienResponse> result =
-                entretienService.listerTousLesEntretiens(pageable);
+        Page<EntretienResponse> result = entretienService.listerTousLesEntretiens(pageable);
 
         // Assert
-        assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("Salle B2", result.getContent().get(0).getLieu());
+        verify(entretienRepository, never()).findAll(any(Pageable.class));
     }
 
     @Test
-    void deleteEntretien() {
+    void enregistrerResultatMarqueLEntretienReussiPourSonRecruteur() {
         // Arrange
+        User recruteur = new User();
+        recruteur.setId(2L);
+        recruteur.setRole(Role.RECRUTEUR);
+
+        Candidature candidature = new Candidature();
+        candidature.setId(5L);
+        candidature.setStatut(StatutCandidature.EN_ATTENTE);
+
         Entretien entretien = new Entretien();
-        entretien.setId(1L);
-        when(entretienRepository.findById(1L)).thenReturn(Optional.of(entretien));
+        entretien.setId(9L);
+        entretien.setCandidature(candidature);
+        entretien.setRecruteur(recruteur);
+        entretien.setStatut(StatutEntretien.PLANIFIE);
+
+        when(currentUserService.isCandidat()).thenReturn(false);
+        when(currentUserService.hasRole(Role.RECRUTEUR)).thenReturn(true);
+        when(currentUserService.get()).thenReturn(recruteur);
+        when(entretienRepository.findById(9L)).thenReturn(Optional.of(entretien));
+        when(entretienRepository.save(entretien)).thenReturn(entretien);
+        when(candidatureRepository.save(candidature)).thenReturn(candidature);
 
         // Act
-        String result = entretienService.deleteEntretien(1L);
+        EntretienResponse result = entretienService.enregistrerResultat(9L, StatutEntretien.REUSSI);
 
         // Assert
-        assertEquals("Entretien supprimé avec succès", result);
+        assertEquals(StatutEntretien.REUSSI, result.getStatut());
+        verify(entretienRepository).save(entretien);
+        // candidature should be accepted when entretien is REUSSI
+        assertEquals(StatutCandidature.ACCEPTEE, candidature.getStatut());
+        verify(candidatureRepository).save(candidature);
     }
 }

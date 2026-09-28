@@ -16,6 +16,13 @@ import java.util.List;
 @NoArgsConstructor
 public class OffreEmploi {
 
+    @PrePersist
+    void onCreate() {
+        if (datePublication == null) {
+            datePublication = LocalDate.now();
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,6 +42,9 @@ public class OffreEmploi {
 
     @Column(name = "date_limite", nullable = false)
     private LocalDate dateLimite;
+
+    @Column(name = "date_publication", nullable = false, updatable = false)
+    private LocalDate datePublication;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "recruteur_id", nullable = false)

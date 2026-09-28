@@ -1,6 +1,7 @@
 package com.HireHub.HireHub.entity;
 
 import jakarta.persistence.*;
+import com.HireHub.HireHub.entity.enums.StatutEntretien;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,10 @@ public class Entretien {
 
     @Column(nullable = false, length = 150)
     private String lieu;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatutEntretien statut;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "candidature_id", nullable = false)

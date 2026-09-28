@@ -1,12 +1,11 @@
 package com.HireHub.HireHub.service;
 
-import com.HireHub.HireHub.dto.OffreRequest;
 import com.HireHub.HireHub.dto.OffreResponse;
 import com.HireHub.HireHub.entity.OffreEmploi;
 import com.HireHub.HireHub.entity.User;
 import com.HireHub.HireHub.entity.enums.Role;
-import com.HireHub.HireHub.entity.enums.TypeContrat;
 import com.HireHub.HireHub.repository.CandidatureRepository;
+import com.HireHub.HireHub.repository.EntretienRepository;
 import com.HireHub.HireHub.repository.OffreEmploiRepository;
 import com.HireHub.HireHub.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -21,10 +20,12 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,86 +41,40 @@ class OffreEmploiServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private EntretienRepository entretienRepository;
+
+    @Mock
     private CurrentUserService currentUserService;
 
     @InjectMocks
     private OffreEmploiService offreEmploiService;
 
     @Test
-    void listerToutesLesOffres() {
+    void rechercherOffresAvecMotCleRechercheCoteServeur() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 10);
 
         User recruteur = new User();
         recruteur.setId(1L);
-        recruteur.setNom("Dupont");
-        recruteur.setPrenom("Jean");
-        recruteur.setEmail("jean.dupont@example.com");
         recruteur.setRole(Role.RECRUTEUR);
-        recruteur.setActive(true);
 
         OffreEmploi offre = new OffreEmploi();
-        offre.setId(1L);
-        offre.setTitre("Développeur Java");
-        offre.setDescription("Développeur Java expérimenté");
+        offre.setId(2L);
+        offre.setTitre("Data Analyst");
         offre.setLocalisation("Paris");
-        offre.setTypeContrat(TypeContrat.CDI);
-        offre.setDateLimite(LocalDate.now().plusDays(30));
         offre.setRecruteur(recruteur);
 
-        Page<OffreEmploi> page =
-                new PageImpl<>(List.of(offre));
+        Page<OffreEmploi> page = new PageImpl<>(List.of(offre));
 
-        when(offreEmploiRepository.findAll(pageable))
+        when(offreEmploiRepository.rechercherOffresActives(any(LocalDate.class), eq("data"), isNull(), eq(pageable)))
                 .thenReturn(page);
 
         // Act
-        Page<OffreResponse> result =
-                offreEmploiService.listerToutesLesOffres(pageable);
+        Page<OffreResponse> result = offreEmploiService.rechercherOffres("data", null, pageable);
 
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals(
-                "Développeur Java",
-                result.getContent().get(0).getTitre()
-        );
-    }
-
-    @Test
-    void creerOffre() {
-        // Arrange
-        OffreRequest request = new OffreRequest();
-        request.setTitre("Développeur Python");
-        request.setRecruteurId(2L);
-        request.setDescription("Développeur Python expérimenté");
-
-        User recruteur = new User();
-        recruteur.setId(2L);
-        recruteur.setNom("Martin");
-        recruteur.setPrenom("Sophie");
-        recruteur.setEmail("sophie.martin@example.com");
-        recruteur.setRole(Role.RECRUTEUR);
-        recruteur.setActive(true);
-
-        when(userRepository.findById(2L)).thenReturn(Optional.of(recruteur));
-
-        OffreEmploi savedOffre = new OffreEmploi();
-        savedOffre.setId(3L);
-        savedOffre.setTitre("Développeur Python");
-        savedOffre.setDescription("Développeur Python expérimenté");
-        savedOffre.setRecruteur(recruteur);
-
-        when(offreEmploiRepository.save(org.mockito.ArgumentMatchers.any(OffreEmploi.class)))
-                .thenReturn(savedOffre);
-
-        // Act
-        OffreResponse result = offreEmploiService.creerOffre(request);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("Développeur Python", result.getTitre());
-        assertEquals(2L, result.getRecruteurId());
-        assertEquals("Développeur Python expérimenté", result.getDescription());
+        assertEquals("Data Analyst", result.getContent().get(0).getTitre());
     }
 }

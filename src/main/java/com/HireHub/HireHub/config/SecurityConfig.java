@@ -3,6 +3,7 @@ package com.HireHub.HireHub.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,7 +29,7 @@ public class SecurityConfig {
     private final List<String> allowedOrigins;
 
     public SecurityConfig(JwtFilter jwtFilter,
-                          @Value("${cors.allowed-origins:http://localhost:5173}") List<String> allowedOrigins) {
+                          @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:8080}") List<String> allowedOrigins) {
         this.jwtFilter = jwtFilter;
         this.allowedOrigins = allowedOrigins;
     }
@@ -50,6 +51,11 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/actuator/info"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/offres/{id}/candidatures")
+                        .hasAnyRole("ADMIN", "RECRUTEUR")
+                        .requestMatchers(HttpMethod.GET, "/api/offres/recruteur/**")
+                        .hasAnyRole("ADMIN", "RECRUTEUR")
+                        .requestMatchers(HttpMethod.GET, "/api/offres/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

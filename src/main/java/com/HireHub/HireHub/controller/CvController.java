@@ -3,9 +3,9 @@ package com.HireHub.HireHub.controller;
 import com.HireHub.HireHub.dto.CvFichier;
 import com.HireHub.HireHub.dto.CvRequest;
 import com.HireHub.HireHub.dto.CvResponse;
-import com.HireHub.HireHub.exception.ResourceNotFoundException;
 import com.HireHub.HireHub.service.CvService;
 import com.HireHub.HireHub.service.CurrentUserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -36,18 +36,16 @@ public class CvController {
         if (currentUserService.isCandidat()) {
             return cvService.listerCVParCandidat(currentUserService.get().getId(), pageable);
         }
+        if (currentUserService.isRecruteur()) {
+            return cvService.listerCVParRecruteur(currentUserService.get().getId(), pageable);
+        }
         return cvService.listerAllCv(pageable);
     }
 
     @GetMapping("/{cvId}")
     public CvResponse findById(@PathVariable long cvId) {
-        CvResponse cv = cvService.consulterCVparId(cvId);
-
-        if (currentUserService.isCandidat() && cv.getCandidat().getId() != currentUserService.get().getId()) {
-            throw new ResourceNotFoundException("CV introuvable avec l'id " + cvId);
-        }
-
-        return cv;
+        cvService.verifierAcces(cvId);
+        return cvService.consulterCVparId(cvId);
     }
 
     @GetMapping("/candidat/{candidatId}")
@@ -55,6 +53,10 @@ public class CvController {
                                            @PageableDefault(sort = "id") Pageable pageable) {
         if (currentUserService.isCandidat()) {
             candidatId = currentUserService.get().getId();
+            return cvService.listerCVParCandidat(candidatId, pageable);
+        }
+        if (currentUserService.isRecruteur()) {
+            return cvService.listerCVParCandidatEtRecruteur(candidatId, currentUserService.get().getId(), pageable);
         }
         return cvService.listerCVParCandidat(candidatId, pageable);
     }
@@ -73,12 +75,7 @@ public class CvController {
 
     @GetMapping("/download/{cvId}")
     public ResponseEntity<byte[]> download(@PathVariable long cvId) {
-        if (currentUserService.isCandidat()) {
-            CvResponse cv = cvService.consulterCVparId(cvId);
-            if (cv.getCandidat().getId() != currentUserService.get().getId()) {
-                throw new ResourceNotFoundException("CV introuvable avec l'id " + cvId);
-            }
-        }
+        cvService.verifierAcces(cvId);
         CvFichier cvFichier = cvService.telechargerCv(cvId);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + cvFichier.getNomFichier() + "\"")
@@ -88,13 +85,13 @@ public class CvController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @PostMapping
-    public ResponseEntity<CvResponse> save(@RequestBody CvRequest request) {
+    public ResponseEntity<CvResponse> save(@Valid @RequestBody CvRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cvService.creerCv(request));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @PutMapping("/{cvId}")
-    public CvResponse update(@PathVariable long cvId, @RequestBody CvRequest request) {
+    public CvResponse update(@PathVariable long cvId, @Valid @RequestBody CvRequest request) {
         return cvService.updateCv(cvId, request);
     }
 
