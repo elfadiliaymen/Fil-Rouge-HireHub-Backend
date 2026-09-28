@@ -52,7 +52,7 @@ class UserServiceTest {
         user.setNom("Jean");
         user.setPrenom("Dupont");
         user.setEmail("jean.dupont@example.com");
-        user.setPassword("$2a$10$ancienHash");
+        user.setPassword("initialPasswordValue");
         user.setRole(Role.CANDIDAT);
 
         UserRequest request = new UserRequest();
@@ -67,6 +67,6 @@ class UserServiceTest {
         // Assert
         assertEquals("0611223344", user.getTelephone());
         assertEquals("Jean", user.getNom());
-        assertEquals("$2a$10$ancienHash", user.getPassword());
+        assertEquals("initialPasswordValue", user.getPassword());
     }
 }

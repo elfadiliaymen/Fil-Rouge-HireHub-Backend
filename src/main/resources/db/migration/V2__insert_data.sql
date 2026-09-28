@@ -1,15 +1,16 @@
 -- 002_seed_data_ma.sql
 -- Demo seed (Moroccan names/places)
--- Password for all demo accounts = "password"
--- BCrypt hash:
--- $2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2
+-- Demo users omitted from seed data for security reasons.
+-- Remove any hardcoded password hashes from migrations. Create initial users via the application registration
+-- flow or provide hashed passwords at deploy time using secure secrets management.
 
-INSERT IGNORE INTO users (id, nom, prenom, email, password, role, active) VALUES
-    (1, 'Benali',     'Youssef', 'admin@hirehub.ma',           '$2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2', 'ADMIN',     1),
-    (2, 'El Amrani',  'Salma',   'salma.elamrani@hirehub.ma',  '$2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2', 'RECRUTEUR', 1),
-    (3, 'Benjelloun', 'Omar',    'omar.benjelloun@hirehub.ma', '$2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2', 'RECRUTEUR', 1),
-    (4, 'Alaoui',     'Imane',   'imane.alaoui@hirehub.ma',    '$2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2', 'CANDIDAT',  1),
-    (5, 'El Idrissi', 'Hamza',   'hamza.elidrissi@hirehub.ma', '$2a$10$wMRnjIn1mQXS6mQVnjaQwu2C2h3wL7ou9TwjNQIZmcmAGVAB9WuZ2', 'CANDIDAT',  1);
+-- Example: create users via backend endpoints or run a secure script that reads
+-- passwords from environment variables and hashes them with BCrypt before inserting.
+
+-- INSERT statements for users were intentionally removed to avoid embedding bcrypt
+-- hashes or credentials in the repository.
+
+
 
 INSERT IGNORE INTO offres_emploi
     (id, titre, description, localisation, type_contrat, date_publication, date_limite, recruteur_id)
