@@ -44,20 +44,12 @@ public class JwtUtils {
                 .getBody();
     }
 
-    public Long extractUserId(String token) {
-        return extractClaims(token).get("id", Long.class);
-    }
-
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
     public String extractUserRole(String token) {
         return extractClaims(token).get("role", String.class);
-    }
-
-    public Date extractExpiration(String token) {
-        return extractClaims(token).getExpiration();
     }
 
     public boolean validateToken(String token) {
