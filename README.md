@@ -1,3 +1,15 @@
+<img width="1933" height="1246" alt="lastdiagHIREHUB" src="https://github.com/user-attachments/assets/390bac67-15a5-4003-a937-1a86a8defc6a" />
+
+<img width="2008" height="2643" alt="HireHubUsecase" src="https://github.com/user-attachments/assets/8bfc415d-ae07-441b-aee6-3ddc7e7b93cc" />
+
+<img width="1381" height="975" alt="AuthentificationCase" src="https://github.com/user-attachments/assets/d8999611-49a4-42e9-9861-b9cb62017e2e" />
+
+<img width="1501" height="1102" alt="Consulter le tableau de bord " src="https://github.com/user-attachments/assets/710ae0d6-1b57-4d32-be49-fe385b6a2167" />
+<img width="1395" height="1057" alt="Postuler à une offre" src="https://github.com/user-attachments/assets/ffb847af-053b-4cb9-a59d-6ad2ab3752f2" />
+
+<img width="1453" height="1059" alt="Programmer un entretien" src="https://github.com/user-attachments/assets/5b21a6da-0d4b-46d8-a2a9-0062a9cfd405" />
+<img width="1381" height="927" alt="Traiter une candidature (Recruteur)" src="https://github.com/user-attachments/assets/f35c31a2-38d1-45ea-9bb7-cfce805c16f9" />
+
 # HireHub — Backend (API REST)
 
 **Nom du projet :** HireHub — Backend (API REST de la plateforme de recrutement)
