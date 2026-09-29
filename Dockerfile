@@ -3,10 +3,10 @@ WORKDIR /build
 COPY pom.xml .
 RUN mvn -q dependency:go-offline
 COPY src ./src
-RUN mvn -q -DskipTests package
+RUN mvn -q -DskipTests package && mv target/*.jar /build/app.jar
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /build/target/HireHub-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /build/app.jar app.jar
 EXPOSE 8090
 ENTRYPOINT ["java", "-jar", "app.jar"]
